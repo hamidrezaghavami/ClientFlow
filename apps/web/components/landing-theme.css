@@ -1,0 +1,130 @@
+.landing-shell {
+  --paper: #f4f3ef;
+  --ink: #232220;
+  --line: #d9d5cc;
+  --teal: #ae3b00;
+  --landing-orange: #fa6519;
+  --landing-muted: #54514a;
+  max-width: 1600px;
+  margin: clamp(9px, 2vw, 28px) auto;
+  width: calc(100% - clamp(18px, 4vw, 56px));
+  border-radius: clamp(16px, 2vw, 28px);
+  overflow: clip;
+  background: var(--paper);
+  color: var(--ink);
+}
+.landing-shell .site-header { background: transparent; border-bottom: 0; }
+.landing-shell .header-inner { height: 84px; }
+.landing-shell .brand { letter-spacing: -.055em; }
+.landing-shell .brand-mark { color: #e6530a; }
+.landing-shell .brand-dot { display: none; }
+.landing-shell .header-actions .button { background: var(--landing-orange); color: #21170f; border-radius: 11px; }
+.landing-shell .header-actions .button:hover { background: #ff8444; }
+.landing-shell .mobile-nav { background: var(--paper); }
+
+.scope-hero { position: relative; padding: 22px clamp(14px, 4vw, 56px) 21px; text-align: center; }
+.scope-hero-stage { position: relative; isolation: isolate; max-width: 1280px; margin: auto; }
+.scope-hero h1 {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: .035em;
+  margin: 0;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: clamp(78px, 11.2vw, 164px);
+  font-weight: 900;
+  line-height: .77;
+  letter-spacing: -.035em;
+}
+.scope-hero h1 > * { display: block; }
+.scope-hero h1 > :nth-child(2) { padding-left: 27%; }
+.scope-hero h1 em { color: #d84900; font-style: normal; }
+.scope-hero > p { max-width: 490px; margin: 25px auto 0; color: var(--landing-muted); font-size: clamp(15px, 1.5vw, 20px); line-height: 1.48; text-wrap: balance; }
+.scope-hero-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px 19px; margin-top: 21px; }
+.scope-hero-cta {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 20px; min-width: 220px; min-height: 54px;
+  padding: 7px 8px 7px 18px; border: 1px solid #161513; border-radius: 12px; background: #262522; color: #fff;
+  box-shadow: 0 0 0 4px #dedbd3, inset 0 1px #ffffff35; font-size: 15px; font-weight: 700;
+}
+.scope-hero-cta svg { box-sizing: content-box; padding: 8px; border-radius: 7px; background: var(--landing-orange); color: #21170f; }
+.scope-hero-cta:hover { background: #403d36; }
+.scope-hero-tour { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; font-size: 13px; font-weight: 700; }
+.scope-hero-tour:hover { color: var(--teal); }
+.scope-hero-down { display: grid; place-items: center; margin: 15px auto 0; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; }
+.scope-hero-down:hover { background: #e7e3da; }
+
+.scope-hero-stack, .scope-hero-outcome { position: absolute; z-index: 2; pointer-events: none; }
+.scope-hero-stack { left: 2%; top: 29%; width: 29%; height: 44%; text-align: left; }
+.scope-hero-outcome { right: 1%; bottom: 1%; width: 22%; height: 40%; }
+.scope-hero-tile {
+  position: absolute; display: grid; align-content: start; gap: .45em; width: 58%; min-height: 74%;
+  padding: .85em; border: 1px solid #1f1b192b; border-radius: .8em;
+  box-shadow: 0 13px 22px #34271828, inset 0 1px #ffffff55;
+  font-size: clamp(9px, 1.03vw, 16px); transform: rotate(var(--turn));
+}
+.scope-hero-tile > span, .scope-hero-tray { display: flex; align-items: center; gap: .4em; font-size: .72em; font-weight: 700; }
+.scope-hero-tile svg, .scope-hero-tray svg { width: 1.15em; height: 1.15em; }
+.scope-hero-tile > strong { max-width: 9ch; font-size: 1.65em; letter-spacing: -.045em; line-height: 1; }
+.scope-hero-tile > small { font-size: .72em; }
+.scope-hero-brief { --turn: -19deg; --from-x: -48px; --from-y: -38px; left: 0; top: 0; color: #241d0c; background: linear-gradient(140deg,#ffdd72,#f5ad27); }
+.scope-hero-swap { --turn: -6deg; --from-x: -28px; --from-y: 42px; left: 24%; top: 9%; color: #26231f; background: linear-gradient(145deg,#fff,#e3ded4); }
+.scope-hero-addon { --turn: 13deg; --from-x: 36px; --from-y: -36px; left: 47%; top: 17%; color: #20150d; background: linear-gradient(140deg,#ff994f,#fa6519); }
+.scope-hero-brief > strong, .scope-hero-swap > strong { max-width: 6ch; font-size: 1.35em; }
+.scope-hero-tray {
+  position: absolute; left: 18%; right: -3%; bottom: 2%; min-height: 2.6em; padding: .4em 1em;
+  color: #fff; background: #292722; border: 1px solid #4e4a42; border-radius: .65em;
+  box-shadow: 0 8px 18px #30261a35; font-size: clamp(8px, .9vw, 14px);
+}
+.scope-hero-outcome .scope-hero-tile { min-height: 65%; align-content: center; justify-items: start; }
+.scope-hero-outcome .scope-hero-tile > svg { width: 1.7em; height: 1.7em; }
+.scope-hero-calendar { --turn: -12deg; --from-x: 48px; --from-y: -25px; top: 0; left: 0; color: #fff; background: linear-gradient(150deg,#54534f,#262522); }
+.scope-hero-approved { --turn: 13deg; --from-x: 54px; --from-y: 28px; top: 30%; left: 44%; color: #173423; background: linear-gradient(145deg,#d8f2b4,#91c985); }
+
+.landing-shell :is(.manifesto-strip, .final-cta) { background: #eae6dc; border-color: var(--line); }
+.landing-shell :is(.section-heading, .showcase-copy) h2 > span,
+.landing-shell :is(.manifesto-strip p > span, .final-cta em) { color: var(--teal); }
+.landing-shell .draw-underline::after { background: #d84900; }
+.landing-shell :is(.section-heading > p:last-child, .showcase-copy > p:not(.eyebrow), .feature-grid p, .showcase-copy li p, .showcase-copy li > span, .final-cta > p:last-child, .site-footer, .dialog-description) { color: var(--landing-muted); }
+.landing-shell .feature-art { margin-top: 0; background: #eae6dc; }
+.landing-shell :is(.person-circle, .mini-tag) { background: #f8c39c; color: #42230f; }
+.landing-shell .people-art div > span, .landing-shell .projects-art small { color: var(--landing-muted); }
+.landing-shell .projects-art i { background: #c9c1b4; }
+.landing-shell .projects-art i:nth-child(-n+2) { background: #d84900; }
+.scope-feature-art { display: flex; flex-wrap: wrap; align-content: center; gap: 6px; padding: 10px; }
+.scope-feature-art > span { display: flex; align-items: center; gap: 4px; padding: 6px 8px; border: 1px solid #d3c8b8; border-radius: 999px; background: #fff8ed; font-size: 11px; }
+.scope-feature-art > span:last-child { background: #def0d4; color: #244328; }
+.landing-shell :is(.final-cta .button, .back-to-top) { background: #262522; color: #fff; border-color: #262522; }
+.landing-shell .back-to-top:hover { background: #403d36; }
+.landing-shell .cta-decoration { color: #d5c6ae; }
+.landing-shell .review-dialog { color: var(--ink); background: var(--paper); border-color: var(--line); }
+.landing-shell .demo-board > section { background: #eae6dc; }
+.landing-shell .demo-board article { background: #fffdf8; }
+.landing-shell .demo-board select { background: #fffdf8; color: var(--ink); border-color: var(--line); }
+.landing-shell .demo-board :is(article p, .demo-priority) { color: var(--landing-muted); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .scope-hero h1 > * { animation: scope-headline-in 620ms cubic-bezier(.2,.7,.3,1) both; }
+  .scope-hero h1 > :nth-child(2) { animation-delay: 70ms; }
+  .scope-hero h1 > :nth-child(3) { animation-delay: 140ms; }
+  .scope-hero-tile { animation: scope-card-in 900ms cubic-bezier(.19,.8,.27,1) 130ms both; }
+  .scope-hero-swap, .scope-hero-calendar { animation-delay: 235ms; }
+  .scope-hero-addon, .scope-hero-approved { animation-delay: 360ms; }
+  .scope-hero-tray { animation: scope-headline-in 600ms 410ms both; }
+  @keyframes scope-headline-in { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0; } }
+  @keyframes scope-card-in {
+    0% { opacity: 0; translate: var(--from-x) var(--from-y); scale: .55; rotate: -14deg; }
+    72% { opacity: 1; translate: 0 -3px; scale: 1.035; rotate: 1deg; }
+    100% { opacity: 1; translate: 0; scale: 1; rotate: 0deg; }
+  }
+}
+@media (max-width: 760px) { .landing-shell .header-inner { height: 65px; } }
+@media (max-width: 900px) {
+  .scope-hero { padding-top: 18px; }
+  .scope-hero-stage { display: grid; grid-template-columns: 1.25fr 1fr; }
+  .scope-hero h1 { grid-column: 1 / -1; font-size: clamp(55px, 13vw, 100px); line-height: .82; }
+  .scope-hero h1 > :nth-child(2) { padding-left: 0; }
+  .scope-hero-stack, .scope-hero-outcome { position: relative; width: auto; inset: auto; height: 126px; margin: 18px 13px 0; }
+  .scope-hero-outcome { height: 100px; margin: 25px 10px 0; }
+  .scope-hero-tile { font-size: clamp(8px, 1.8vw, 13px); }
+  .scope-hero > p { margin-top: 16px; }
+}

@@ -260,3 +260,25 @@
 .client-board-column :is(.client-board-card-meta, .client-board-stage, .client-board-card-title small) {
   color: #d7d2d4;
 }
+
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .workspace .client-board-column .client-board-stage select::picker(select) {
+    background: var(--stage-card);
+    border-color: var(--stage-edge);
+  }
+
+  .workspace .client-board-column .client-board-stage option:is(:checked, :hover, :focus-visible) {
+    background: var(--stage-chip);
+    color: #faf6f2;
+  }
+
+  .workspace .client-board-column .client-board-stage option:focus-visible {
+    outline: 2px solid var(--stage-accent);
+    outline-offset: -2px;
+  }
+
+  .workspace .client-board-column .client-board-stage option::checkmark,
+  .workspace .client-board-column .client-board-stage select::picker-icon {
+    color: var(--stage-accent);
+  }
+}

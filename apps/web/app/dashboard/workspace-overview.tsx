@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ArrowUpRight, CalendarDays, LayoutGrid, Plus, X } from 'lucide-react';
+import { DeadlinePicker } from './deadline-picker';
 
 const stages = ['New', 'In progress', 'In review', 'Delivered'] as const;
 type Stage = (typeof stages)[number];
@@ -142,7 +143,7 @@ export function WorkspaceOverview() {
             <label>Project<input name="project" required maxLength={100} defaultValue={draft.project}
               onInput={event => event.currentTarget.setCustomValidity('')} /></label>
             <label>Contact name<input name="contact" maxLength={80} defaultValue={draft.contact} /></label>
-            <label>Deadline<input name="deadline" type="date" defaultValue={draft.deadline} /></label>
+            <DeadlinePicker initialValue={draft.deadline} />
             <label>Stage<select name="stage" defaultValue={draft.stage}>{stages.map(stage => <option key={stage}>{stage}</option>)}</select></label>
             <div className="client-editor-actions">
               <button type="button" onClick={() => dialog.current?.close()}>Cancel</button>

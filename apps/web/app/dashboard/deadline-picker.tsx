@@ -13,7 +13,11 @@ function dateValue(date: Date) {
     String(part).padStart(index ? 2 : 4, '0')).join('-');
 }
 
-export function DeadlinePicker({ initialValue }: { initialValue: string }) {
+export function DeadlinePicker({ initialValue, name = 'deadline', label = 'Deadline' }: {
+  initialValue: string;
+  name?: string;
+  label?: string;
+}) {
   const calendarId = useId();
   const [value, setValue] = useState(initialValue);
   const [open, setOpen] = useState(false);
@@ -49,8 +53,8 @@ export function DeadlinePicker({ initialValue }: { initialValue: string }) {
         document.getElementById(`${calendarId}-trigger`)?.focus();
       }
     }}>
-      <input type="hidden" name="deadline" value={value} />
-      <span className="deadline-label" id={`${calendarId}-label`}>Deadline</span>
+      <input type="hidden" name={name} value={value} />
+      <span className="deadline-label" id={`${calendarId}-label`}>{label}</span>
       <button type="button" id={`${calendarId}-trigger`} className="deadline-trigger"
         aria-labelledby={`${calendarId}-label ${calendarId}-value`} aria-expanded={open}
         aria-controls={open ? calendarId : undefined} onClick={toggle}>
@@ -58,7 +62,7 @@ export function DeadlinePicker({ initialValue }: { initialValue: string }) {
         <CalendarDays size={17} aria-hidden="true" />
       </button>
       {open && month && (
-        <div className="deadline-calendar" id={calendarId} role="group" aria-label="Choose deadline date">
+        <div className="deadline-calendar" id={calendarId} role="group" aria-label={`Choose ${label.toLowerCase()}`}>
           <div className="deadline-calendar-header">
             <button type="button" aria-label="Previous month" onClick={() => setMonth(new Date(year, monthIndex - 1, 1))}><ChevronLeft size={18} /></button>
             <strong aria-live="polite">{monthLabel.format(month)}</strong>

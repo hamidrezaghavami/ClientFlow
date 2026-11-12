@@ -13,7 +13,7 @@ type ProjectContext = {
 const apiUrl = process.env.NEXT_PUBLIC_CLIENTFLOW_API_URL?.replace(/\/$/, '');
 const suggestions = ['What should I prioritize?', 'Draft a client follow-up', 'Help me plan a handoff'];
 
-export function ClientAssistant({ projects }: { projects: ProjectContext[] }) {
+export function ClientAssistant({ projects, draft }: { projects: ProjectContext[]; draft?: { question: string } }) {
   const { getToken } = useAuth();
   const [open, setOpen] = useState(false);
   const launcher = useRef<HTMLButtonElement>(null);
@@ -34,9 +34,26 @@ export function ClientAssistant({ projects }: { projects: ProjectContext[] }) {
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
 
+  const request = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    if (!draft) return;
+    request.current?.abort();
+    request.current = null;
+    setQuestion(draft.question);
+    setIncludeBoard(false);
+    setAnswer('');
+    setError('');
+    setPending(false);
+    setOpen(true);
+    panel.current?.querySelector('textarea')?.focus();
+  }, [draft]);
+
   async function ask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!apiUrl || !question.trim() || pending) return;
+    const controller = new AbortController();
+    request.current = controller;
     setPending(true);
     setError('');
     setAnswer('');
@@ -46,16 +63,19 @@ export function ClientAssistant({ projects }: { projects: ProjectContext[] }) {
       const response = await fetch(`${apiUrl}/assistant`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(25_000),
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(25_000)]),
         body: JSON.stringify({ question, projects: includeBoard ? projects.slice(0, 20) : [] }),
       });
       const data = await response.json() as { answer?: string; error?: string };
       if (!response.ok || !data.answer) throw new Error(data.error ?? 'The assistant is unavailable.');
-      setAnswer(data.answer);
+      if (!controller.signal.aborted) setAnswer(data.answer);
     } catch (problem) {
-      setError(problem instanceof Error && problem.name === 'Error' ? problem.message : 'The assistant did not respond. Try again.');
+      if (!controller.signal.aborted) setError(problem instanceof Error && problem.name === 'Error' ? problem.message : 'The assistant did not respond. Try again.');
     } finally {
-      setPending(false);
+      if (request.current === controller) {
+        request.current = null;
+        setPending(false);
+      }
     }
   }
 

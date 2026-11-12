@@ -566,3 +566,102 @@
     transition: grid-template-rows 230ms cubic-bezier(.2, .75, .25, 1);
   }
 }
+
+.client-board-toolbar { display: flex; margin-bottom: 8px; }
+.client-board-search {
+  display: flex; align-items: center; gap: 9px; width: min(100%, 290px); min-height: 40px;
+  padding-inline: 13px; border: 1px solid var(--board-border); border-radius: 999px;
+  background: #1c1426; color: var(--board-muted);
+}
+.client-board-search svg { flex: none; }
+.client-board-search:focus-within { border-color: #ca9cf8; }
+.client-board-search input { width: 100%; min-width: 0; color: inherit; font: inherit; font-size: 13px; background: transparent; border: 0; outline: none; }
+.client-board-search input::placeholder { color: var(--board-muted); }
+.client-card-next { display: flex; align-items: flex-start; gap: 7px; margin: 0 0 10px; font-size: 12px; overflow-wrap: anywhere; }
+.client-card-next svg { flex: none; color: var(--stage-accent); }
+.client-card-next strong { display: block; color: var(--stage-accent); font-size: 11px; font-weight: 650; }
+.client-archive-list { display: grid; gap: 8px; margin-top: 16px; list-style: none; }
+.client-archive-item { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.client-archive-item button, .client-archive-action {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none;
+  border: 1px solid var(--board-border); border-radius: 999px; padding: 8px 12px;
+}
+.client-archive-item button:hover, .client-archive-action:hover { background: #3a2850; }
+.client-archive-action { margin-right: auto; }
+.client-editor-actions { flex-wrap: wrap; }
+
+.client-action-launcher { position: relative; }
+.client-action-count {
+  position: absolute; top: -4px; right: -4px; min-width: 17px; padding-inline: 4px;
+  border-radius: 999px; background: var(--board-purple); color: #1b1026; font-size: 10px;
+}
+.client-waiting-chip {
+  display: inline-block; margin: 4px 0; padding: 2px 8px; border: 1px solid var(--stage-edge);
+  border-radius: 999px; background: var(--stage-chip); color: var(--stage-accent); font-size: 11px;
+}
+.client-action-dialog { width: min(500px, calc(100% - 32px)); }
+.client-action-group { margin-top: 17px; }
+.client-action-group h3 { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 650; }
+.client-action-group h3 span { color: var(--board-muted); font-size: 12px; }
+.client-action-group .client-archive-list { margin-top: 8px; }
+.client-action-item { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.client-action-edit { flex: 1 1 155px; display: grid; gap: 3px; text-align: left; overflow-wrap: anywhere; }
+.client-action-edit span, .client-action-edit time { font-size: 12px; }
+.client-action-edit time { color: var(--stage-accent); }
+.client-action-draft {
+  display: inline-flex; gap: 6px; align-items: center; min-height: 36px; padding: 0 10px;
+  border: 1px solid var(--stage-edge); border-radius: 999px; color: var(--stage-accent); font-size: 12px;
+}
+.client-action-draft:hover { background: var(--stage-edge); }
+
+.client-scope-trigger {
+  display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; min-height: 32px;
+  padding: 0 9px; border: 1px solid var(--stage-edge); border-radius: 999px;
+  color: var(--stage-accent); font-size: 11px;
+}
+.client-scope-trigger:hover { background: var(--stage-chip); }
+.scope-dialog { width: min(540px, calc(100% - 32px)); }
+.scope-dialog .client-editor-heading p, .scope-proposal label > span, .scope-request > span,
+.scope-history li > span { color: var(--board-muted); font-size: 12px; }
+.scope-proposal { margin-top: 16px; }
+.scope-proposal textarea {
+  width: 100%; border: 1px solid #5d476c; border-radius: 12px;
+  padding: 8px; background: inherit; color: inherit; font: inherit; resize: vertical;
+}
+.scope-form-grid, .scope-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.scope-request { display: grid; gap: 3px; margin-bottom: 16px; overflow-wrap: anywhere; }
+.scope-options { min-width: 0; border: 0; padding: 0; }
+.scope-options legend { margin-bottom: 8px; font-size: 13px; }
+.scope-options label {
+  grid-template-columns: auto 1fr; align-content: start; border: 1px solid #5d476c;
+  border-radius: 18px; padding: 12px; background: #1c1426; cursor: pointer; overflow-wrap: anywhere;
+}
+.scope-options label:has(:checked) { border-color: var(--board-purple); background: #38254b; }
+.scope-options label > :is(strong, span) { grid-column: 1 / -1; }
+.scope-options input { width: 16px; min-height: 16px; accent-color: var(--board-purple); }
+.scope-options svg { color: var(--board-purple); }
+.scope-actions { margin-top: 12px; }
+.scope-actions button:disabled { opacity: .5; }
+.scope-history { margin-top: 18px; }
+.scope-history h3 { font-size: 14px; font-weight: 650; }
+.scope-history-total { color: var(--board-muted); font-size: 12px; }
+.scope-history ol { display: grid; gap: 8px; margin-top: 8px; padding: 0; list-style: none; }
+.scope-history ol > li {
+  display: grid; gap: 3px; border: 1px solid var(--board-border); border-radius: 15px;
+  padding: 10px; font-size: 13px; overflow-wrap: anywhere;
+}
+.scope-history details { font-size: 12px; }
+.scope-history details ul { padding-left: 18px; }
+@media (max-width: 420px) { .scope-form-grid, .scope-options { grid-template-columns: 1fr; } }
+
+.scope-review-page { display: grid; place-items: center; padding: 24px; }
+.scope-review-card {
+  width: min(100%, 540px); padding: clamp(18px, 5vw, 36px); border: 1px solid var(--board-border);
+  border-radius: 24px; background: #251a31;
+}
+.scope-review-brand { color: var(--board-purple); font-size: 14px; font-weight: 700; }
+.scope-review-card h1 { margin: 7px 0 18px; font-size: clamp(24px, 5vw, 34px); font-weight: 650; }
+.scope-review-card .scope-options label { display: grid; gap: 7px; }
+.scope-review-card .scope-options label span { color: var(--board-muted); font-size: 12px; }
+.scope-review-confirmation { margin-top: 14px; color: #9bdbc6; }
+.scope-share-link { display: grid; gap: 6px; margin-top: 12px; }

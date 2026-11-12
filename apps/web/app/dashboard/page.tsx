@@ -8,7 +8,7 @@ import './workspace.css';
 
 export default async function DashboardPage() {
   if (!clerkConfigured) redirect('/sign-in');
-  await auth.protect();
+  const { userId } = await auth.protect();
 
   return (
     <div className="workspace">
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       </header>
-      <WorkspaceOverview />
+      <WorkspaceOverview key={userId} storageKey={`clientflow:board:v1:${userId}`} />
     </div>
   );
 }

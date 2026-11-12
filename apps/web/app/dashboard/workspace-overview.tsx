@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { ArrowUpRight, CalendarDays, LayoutGrid, Plus, X } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, ChevronRight, Plus, X } from 'lucide-react';
 import { DeadlinePicker } from './deadline-picker';
 
 const stages = ['New', 'In progress', 'In review', 'Delivered'] as const;
@@ -24,6 +24,18 @@ export function WorkspaceOverview() {
   const [clients, setClients] = useState(initialClients);
   const [draft, setDraft] = useState<Engagement | null>(null);
   const [announcement, setAnnouncement] = useState('');
+  const [today, setToday] = useState('');
+  const dueClients = clients
+    .filter(item => item.deadline && item.stage !== 'Delivered')
+    .sort((a, b) => a.deadline.localeCompare(b.deadline));
+  const overdueCount = today ? dueClients.filter(item => item.deadline < today).length : 0;
+
+  useEffect(() => {
+    const now = new Date();
+    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+    setToday(localDate.toISOString().slice(0, 10));
+  }, []);
+
   const dialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -67,19 +79,36 @@ export function WorkspaceOverview() {
 
   return (
     <main id="workspace-main" className="client-board-shell">
-      <aside className="client-board-sidebar" aria-label="Client directory">
-        <p className="client-board-current"><LayoutGrid size={17} /> Client board</p>
-        <h2>Clients</h2>
-        <ul>
-          {clients.map(item => (
-            <li key={item.id}>
-              <button type="button" onClick={() => openEditor(item)}>
-                <span className="client-board-avatar" aria-hidden="true">{item.client.charAt(0).toUpperCase()}</span>
-                {item.client}
-              </button>
-            </li>
-          ))}
-        </ul>
+      <aside className="client-board-sidebar" aria-labelledby="deadline-panel-title">
+        <div className="deadline-panel-heading">
+          <span className="deadline-panel-icon"><CalendarDays size={18} aria-hidden="true" /></span>
+          <div>
+            <h2 id="deadline-panel-title">Due next</h2>
+            <p>{overdueCount ? `${overdueCount} overdue` : 'Client deadlines'}</p>
+          </div>
+        </div>
+        {dueClients.length ? (
+          <ol className="deadline-panel-list">
+            {dueClients.slice(0, 3).map(item => {
+              const overdue = today && item.deadline < today;
+              return (
+                <li key={item.id}>
+                  <button type="button" className="deadline-panel-item" onClick={() => openEditor(item)}
+                    aria-label={`Edit ${item.project} for ${item.client}, due ${formatDeadline(item.deadline)}${overdue ? ', overdue' : ''}`}>
+                    <span>
+                      <span className={overdue ? 'deadline-panel-date is-overdue' : 'deadline-panel-date'}>
+                        <time dateTime={item.deadline}>{formatDeadline(item.deadline)}</time>{overdue && ' · Overdue'}
+                      </span>
+                      <strong>{item.project}</strong>
+                      <small>{item.client}</small>
+                    </span>
+                    <ChevronRight size={15} aria-hidden="true" />
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        ) : <p className="deadline-panel-empty">No open client deadlines.</p>}
       </aside>
 
       <section className="client-board-main" aria-labelledby="client-board-title">

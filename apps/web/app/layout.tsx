@@ -19,6 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           signInFallbackRedirectUrl="/dashboard"
           signUpFallbackRedirectUrl="/dashboard"
           afterSignOutUrl="/"
+          localization={{ signIn: { start: { title: 'Sign in to ClientFlow' } } }}
           appearance={{
             elements: { headerTitle: 'clientflow-account-title', footerActionLink: 'clientflow-auth-link', formFieldAction: 'clientflow-auth-link' },
             variables: {

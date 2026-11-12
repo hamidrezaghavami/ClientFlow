@@ -74,7 +74,7 @@ app.post('/assistant',
       res.status(400).json({ error: 'Enter a question of up to 1,200 characters.' });
       return;
     }
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
     if (!apiKey) {
       res.status(503).json({ error: 'Gemini is not configured yet.' });
       return;
@@ -98,7 +98,21 @@ app.post('/assistant',
         res.status(429).json({ error: 'Gemini is busy or at its quota. Try again later.' });
         return;
       }
-      if (!response.ok) throw new Error('Gemini request failed');
+      if (!response.ok) {
+        const failure = await response.json().catch(() => null) as {
+          error?: { status?: string; details?: { reason?: string }[] };
+        } | null;
+        const reason = failure?.error?.details?.find(detail => detail.reason)?.reason;
+        const safeReason = reason && /^[A-Z_]{1,64}$/.test(reason) ? reason : undefined;
+        console.warn('Gemini rejected the request', { status: response.status, reason: safeReason });
+        const message = safeReason === 'API_KEY_INVALID' || safeReason === 'API_KEY_SERVICE_BLOCKED' || response.status === 403
+          ? 'Gemini rejected the API credentials. Check the key in Vercel.'
+          : response.status === 404
+            ? 'The configured Gemini model is unavailable for this project.'
+            : 'Gemini rejected the request. Please try again.';
+        res.status(502).json({ error: message });
+        return;
+      }
       const result = await response.json() as { candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[] };
       const answer = result.candidates?.[0]?.content?.parts?.filter(part => !part.thought).map(part => part.text ?? '').join('').trim();
       if (!answer) {
@@ -106,7 +120,11 @@ app.post('/assistant',
         return;
       }
       res.json({ answer });
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.name === 'TimeoutError') {
+        res.status(504).json({ error: 'Gemini took too long to respond. Please try again.' });
+        return;
+      }
       res.status(502).json({ error: 'Gemini did not respond. Please try again.' });
     }
   },

@@ -1,11 +1,12 @@
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { clerkConfigured } from '../auth-config';
+import '@fontsource/barlow-condensed/900.css';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ClientFlow — Make room for your best work',
-  description: 'A calmer home for your clients, projects, and tasks.',
+  title: 'ClientFlow — Client projects and scope approvals',
+  description: 'Manage freelance client projects, track deadlines, and get scope changes approved with a single link.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           signUpFallbackRedirectUrl="/dashboard"
           afterSignOutUrl="/"
           appearance={{
+            elements: { headerTitle: 'clientflow-account-title', footerActionLink: 'clientflow-auth-link', formFieldAction: 'clientflow-auth-link' },
             variables: {
               colorPrimary: '#fa6519',
               colorPrimaryForeground: '#28180f',

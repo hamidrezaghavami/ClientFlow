@@ -431,6 +431,7 @@
 }
 
 :root {
+  --clientflow-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   --clientflow-paper: #f4f3ef;
   --clientflow-ink: #26231f;
   --clientflow-muted: #5e564d;
@@ -440,3 +441,12 @@
   --clientflow-frame-gap: clamp(8px, 1.7vw, 24px);
   --clientflow-frame-radius: clamp(16px, 2vw, 28px);
 }
+
+.clientflow-account-title {
+  font-family: var(--clientflow-display);
+  font-size: clamp(30px, 6vw, 40px);
+  font-weight: 900;
+  letter-spacing: -.025em;
+  line-height: 1;
+}
+.clientflow-auth-link { color: var(--clientflow-brand); }

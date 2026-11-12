@@ -22,7 +22,7 @@ export default async function DashboardPage() {
           <h1 id="workspace-title" className="workspace-title">Client engagements</h1>
           <div className="workspace-account">
             <span>My workspace</span>
-            <UserButton />
+            <UserButton appearance={{ options: { unsafe_disableDevelopmentModeWarnings: true } }} />
           </div>
         </div>
       </header>

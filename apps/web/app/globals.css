@@ -435,3 +435,13 @@
   line-height: 1;
 }
 .clientflow-auth-link { color: var(--clientflow-brand); }
+
+:is(.workspace, .account-shell, .landing-shell)
+  :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--clientflow-brand);
+  outline-offset: 3px;
+}
+:is(.workspace, .account-shell, .landing-shell) ::selection {
+  background: #f9dcc7;
+  color: var(--clientflow-ink);
+}

@@ -15,7 +15,6 @@
 }
 .workspace-header { background: #fffdf9; color: var(--board-ink); border-radius: var(--clientflow-frame-radius) var(--clientflow-frame-radius) 0 0; }
 .workspace-header .brand-mark { color: var(--clientflow-brand); }
-.workspace :is(a, button, select, input, textarea):focus-visible { outline-color: var(--clientflow-brand); }
 .workspace-header-inner, .workspace-account { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .workspace-header-inner { min-height: 66px; padding-inline: clamp(16px, 3vw, 38px); }
 .workspace-account { font-size: 13px; color: #5e564d; }

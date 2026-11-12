@@ -1,5 +1,5 @@
 import express from 'express';
-import { clerkMiddleware, getAuth } from '@clerk/express';
+import { verifyClerkSession } from './clerk-session.js';
 import { rateLimit } from 'express-rate-limit';
 import { z } from 'zod';
 
@@ -44,20 +44,27 @@ app.use('/assistant', (req, res, next) => {
 const assistantLimit = rateLimit({
   windowMs: 60_000,
   limit: 5,
-  keyGenerator: req => getAuth(req).userId ?? 'unauthenticated',
+  keyGenerator: (_req, res) => res.locals.assistantUserId,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Please wait a minute before asking again.' },
 });
 
 app.post('/assistant',
-  clerkMiddleware({ authorizedParties: allowedOrigins }),
-  (req, res, next) => {
-    if (!getAuth(req).isAuthenticated) {
-      res.status(401).json({ error: 'Your session expired. Sign in again.' });
-      return;
+  async (req, res, next) => {
+    const token = req.get('Authorization')?.slice('Bearer '.length);
+    const origin = req.get('Origin');
+    try {
+      const userId = token && origin ? await verifyClerkSession(token, origin) : null;
+      if (userId) {
+        res.locals.assistantUserId = userId;
+        next();
+        return;
+      }
+    } catch {
+      // Keep token and verification details out of the response.
     }
-    next();
+    res.status(401).json({ error: 'Your session could not be verified. Sign in again.' });
   },
   assistantLimit,
   express.json({ limit: '16kb' }),

@@ -42,7 +42,7 @@ The landing page and interactive demo can be deployed without credentials. To en
 
 The dashboard calendar icon opens Due next. The assistant sends one question per request to Google Gemini. Project titles, stages, and deadlines are included only when the user selects board context. Client and contact names are excluded from that context.
 
-To run the separate Express service, copy `apps/api/.env.example` to `apps/api/.env.local`, set the matching Clerk keys and a Gemini API key, then run:
+To run the separate Express service, copy `apps/api/.env.example` to `apps/api/.env.local`, set the matching Clerk publishable key and a Gemini API key, then run:
 
 ```sh
 npm run build -w @clientflow/api

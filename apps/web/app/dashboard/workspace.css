@@ -207,30 +207,6 @@
 .deadline-calendar-footer { border-top: 1px solid var(--board-border); margin-top: 6px; padding-top: 4px; color: #e1c3ff; }
 .deadline-calendar-footer button { padding-inline: 10px; }
 
-:is(.client-board-column, .deadline-panel-item) {
-  --stage-accent: #a9c9fa;
-  --stage-card: #262d38;
-  --stage-edge: #4a607a;
-  --stage-chip: #34455e;
-}
-:is(.client-board-column, .deadline-panel-item)[data-stage="1"] {
-  --stage-accent: #f3b69c;
-  --stage-card: #342b2b;
-  --stage-edge: #735548;
-  --stage-chip: #553a33;
-}
-:is(.client-board-column, .deadline-panel-item)[data-stage="2"] {
-  --stage-accent: #efd093;
-  --stage-card: #332e25;
-  --stage-edge: #716143;
-  --stage-chip: #51442e;
-}
-:is(.client-board-column, .deadline-panel-item)[data-stage="3"] {
-  --stage-accent: #9fd9c5;
-  --stage-card: #253330;
-  --stage-edge: #47685d;
-  --stage-chip: #314c44;
-}
 .client-board-column { background: #1c1d24; border-color: #3b3d47; }
 .client-board-column h2 i[data-stage] { background: var(--stage-accent); }
 .client-board-column .client-board-card { background: var(--stage-card); border-color: var(--stage-edge); }

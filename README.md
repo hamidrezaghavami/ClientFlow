@@ -1,38 +1,27 @@
 # ClientFlow
 
-ClientFlow helps freelancers manage client projects, deadlines, next actions, and scope approvals. Clients can open a private review link and approve a scope change. The decision syncs into the freelancer’s board.
+**Manage client projects and agree on scope changes in one place.**
 
-## Local development
+ClientFlow is a workspace for freelancers who juggle multiple clients. See what’s due, what needs your attention, and what you’re waiting on. When a client asks for something extra, give them clear options and keep a record of what they approve.
 
-Use Node.js 22+ and npm. Run `npm ci` from the repository root, then configure the two apps from their respective `.env.example` files.
+[Explore ClientFlow](https://clientflow-chi-amber.vercel.app/)
 
-- `apps/web/.env.local` holds Clerk’s frontend and server keys and `NEXT_PUBLIC_CLIENTFLOW_API_URL`. For local development, use `http://127.0.0.1:3001` as the API URL.
-- `apps/api/.env.local` holds the matching Clerk publishable key, the allowed frontend origins, the PostgreSQL connection, and the Gemini key. Keep this file out of Git.
-- For a new database, apply `apps/api/db/client-boards.sql` and `apps/api/db/scope-reviews.sql` before starting the app.
+## When a client asks for one more thing
 
-Run the Express API in one terminal and Next.js in another:
+A client asks you to add a pricing page to their website. You can offer two options:
 
-```sh
-node --env-file=apps/api/.env.local apps/api/src/server.js
-npm run dev
-```
+| Option | What the client gets |
+| --- | --- |
+| **Swap it in** | Replace the About page with the pricing page. Keep the original price and deadline. |
+| **Add it to scope** | Deliver both pages for an extra $350 and a later deadline. |
 
-The frontend defaults to `http://127.0.0.1:3000`. For local auth, enable email and password in Clerk so users can sign in and recover passwords.
+Send one review link. Your client can see the trade-off and approve an option without creating an account. ClientFlow updates the project scope and deadline and saves the decision alongside the original terms.
 
-## Architecture
+## Know what needs your attention
 
-- `apps/web` is the Next.js frontend, including Clerk sign-in and the public scope review page.
-- `apps/api` is a plain JavaScript Node.js and Express backend. It owns board storage, approvals, and the Gemini assistant. It validates Clerk bearer tokens for owner operations and uses PostgreSQL for board and approval data.
-- Client review links authorize reading and approving an individual proposal. The first approval is final.
+- **See where each project stands.** Move engagements from first contact through delivery and keep the next action on each card.
+- **Know who’s up next.** See which actions are yours, which are waiting on a client, and when a follow-up is due.
+- **Draft follow-ups faster.** Ask the Gemini-powered assistant for a message you can review and send yourself.
+- **Pick up where you left off.** Search or archive engagements and access your saved board from any device you sign in on.
 
-```sh
-npm run check -w @clientflow/api
-npm run typecheck
-npm run build
-```
-
-## Deploy
-
-Connect two Vercel projects to this repository and use `main` as the production branch. Set their root directories to `apps/web` and `apps/api`, with the Next.js and Express presets respectively. Allow access to workspace files outside each root so the builds can use the root npm lockfile and the shared board model.
-
-Set the frontend API URL to the API project’s public HTTPS origin. Set `WEB_ORIGINS` on the API project to the exact frontend origin. Configure the Clerk keys for the same Clerk instance on both projects. Store `DATABASE_URL` and `GEMINI_API_KEY` as server-only API environment variables.
+Open the live site and select **Take a tour** for a quick look, or sign in to try the client board and scope review flow.

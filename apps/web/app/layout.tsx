@@ -20,15 +20,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           afterSignOutUrl="/"
           appearance={{
             variables: {
-              colorPrimary: '#ca9ff9',
-              colorPrimaryForeground: '#181122',
-              colorBackground: '#201729',
-              colorForeground: '#f1edf7',
-              colorMutedForeground: '#c3b4d0',
-              colorInput: '#17111f',
-              colorInputForeground: '#f1edf7',
-              colorBorder: '#524064',
-              borderRadius: '.65rem',
+              colorPrimary: '#fa6519',
+              colorPrimaryForeground: '#28180f',
+              colorBackground: '#fffdf9',
+              colorForeground: '#26231f',
+              colorMutedForeground: '#5e564d',
+              colorInput: '#fffaf3',
+              colorInputForeground: '#26231f',
+              colorBorder: '#ded6ca',
+              borderRadius: '.85rem',
+              colorRing: '#ae3b00',
             },
           }}
         >

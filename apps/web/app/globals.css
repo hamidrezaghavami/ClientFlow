@@ -345,19 +345,29 @@
 }
 
 .account-shell {
+  position: relative;
   display: grid;
   justify-items: center;
   align-content: center;
-  min-height: 100svh;
-  padding: 80px 16px 32px;
-  background: radial-gradient(ellipse at 50% 30%, #2a1a39, transparent 58%);
+  min-height: calc(100svh - 2 * var(--clientflow-frame-gap));
+  width: calc(100% - 2 * var(--clientflow-frame-gap));
+  max-width: 1600px;
+  margin: var(--clientflow-frame-gap) auto;
+  padding: 80px 12px 32px;
+  border: 1px solid var(--clientflow-line);
+  border-radius: var(--clientflow-frame-radius);
+  background: radial-gradient(ellipse at 50% 32%, #f9dfc9, transparent 60%), var(--clientflow-paper);
+  color: var(--clientflow-ink);
+  color-scheme: light;
 }
 .account-home {
   position: absolute;
-  top: 24px;
+  top: 22px;
   left: clamp(16px, 5vw, 56px);
-  font-weight: 700;
+  font-size: 22px;
 }
+.account-home .brand-mark { color: var(--clientflow-brand); }
+.account-shell .cl-rootBox { max-width: 100%; }
 .account-summary {
   display: grid;
   justify-items: start;
@@ -365,7 +375,7 @@
   padding: 28px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: var(--paper);
+  background: #fffdf9;
 }
 .account-summary h1 { font-size: clamp(24px, 5vw, 36px); }
 .mobile-nav a.button { justify-content: flex-start; }
@@ -396,26 +406,37 @@
 }
 
 :is(.client-board-column, .deadline-panel-item) {
-  --stage-accent: #a9c9fa;
-  --stage-card: #262d38;
-  --stage-edge: #4a607a;
-  --stage-chip: #34455e;
+  --stage-accent: #365274;
+  --stage-card: #f3f6fa;
+  --stage-edge: #c6d3e2;
+  --stage-chip: #e9eff6;
 }
 :is(.client-board-column, .deadline-panel-item)[data-stage="1"] {
-  --stage-accent: #f3b69c;
-  --stage-card: #342b2b;
-  --stage-edge: #735548;
-  --stage-chip: #553a33;
+  --stage-accent: #934219;
+  --stage-card: #fff6ed;
+  --stage-edge: #e8c2a8;
+  --stage-chip: #f9e0cd;
 }
 :is(.client-board-column, .deadline-panel-item)[data-stage="2"] {
-  --stage-accent: #efd093;
-  --stage-card: #332e25;
-  --stage-edge: #716143;
-  --stage-chip: #51442e;
+  --stage-accent: #745521;
+  --stage-card: #fffbeb;
+  --stage-edge: #dfcfa4;
+  --stage-chip: #f7ebc9;
 }
 :is(.client-board-column, .deadline-panel-item)[data-stage="3"] {
-  --stage-accent: #9fd9c5;
-  --stage-card: #253330;
-  --stage-edge: #47685d;
-  --stage-chip: #314c44;
+  --stage-accent: #305b43;
+  --stage-card: #f2f8ef;
+  --stage-edge: #bdd4bd;
+  --stage-chip: #e0eddf;
+}
+
+:root {
+  --clientflow-paper: #f4f3ef;
+  --clientflow-ink: #26231f;
+  --clientflow-muted: #5e564d;
+  --clientflow-line: #ded6ca;
+  --clientflow-orange: #fa6519;
+  --clientflow-brand: #ae3b00;
+  --clientflow-frame-gap: clamp(8px, 1.7vw, 24px);
+  --clientflow-frame-radius: clamp(16px, 2vw, 28px);
 }

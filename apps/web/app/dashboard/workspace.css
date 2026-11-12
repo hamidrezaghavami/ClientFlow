@@ -106,6 +106,8 @@
   }
 
   .workspace :is(.client-board-stage, .client-editor) select::picker(select) {
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: none;
     margin-block-start: 6px;
     min-width: 150px;
     padding: 5px;

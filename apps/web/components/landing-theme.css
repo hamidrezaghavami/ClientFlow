@@ -83,9 +83,6 @@
 .landing-shell :is(.manifesto-strip, .final-cta) { background: #eae6dc; border-color: var(--line); }
 .landing-shell :is(.section-heading, .showcase-copy) h2 > span,
 .landing-shell :is(.manifesto-strip p > span, .final-cta em) { color: var(--teal); }
-.landing-shell .draw-underline {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 12' preserveAspectRatio='none'%3E%3Cpath fill='%23d84900' d='M0 10C27 2 56 0 89 3C124 6 146 8 177 5C199 3 221 1 240 3C216 4 200 6 177 8C145 11 122 9 88 6C55 3 27 5 0 10Z'/%3E%3C/svg%3E");
-}
 .landing-shell :is(.section-heading > p:last-child, .showcase-copy > p:not(.eyebrow), .feature-grid p, .showcase-copy li p, .showcase-copy li > span, .final-cta > p:last-child, .site-footer, .dialog-description) { color: var(--landing-muted); }
 .landing-shell .feature-art { margin-top: 0; background: #eae6dc; }
 .landing-shell :is(.person-circle, .mini-tag) { background: #f8c39c; color: #42230f; }

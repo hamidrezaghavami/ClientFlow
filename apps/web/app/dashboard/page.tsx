@@ -22,7 +22,14 @@ export default async function DashboardPage() {
           <h1 id="workspace-title" className="workspace-title">Client engagements</h1>
           <div className="workspace-account">
             <span>My workspace</span>
-            <UserButton appearance={{ options: { unsafe_disableDevelopmentModeWarnings: true } }} />
+            <UserButton appearance={{
+              options: { unsafe_disableDevelopmentModeWarnings: true },
+              elements: {
+                userButtonPopoverActionButton: { color: '#26231f', '&:hover': { backgroundColor: '#f4e9db' } },
+                userButtonPopoverActionButtonText: { color: '#26231f' },
+                userButtonPopoverActionButtonIcon: { color: '#634b36' },
+              },
+            }} />
           </div>
         </div>
       </header>

@@ -4,11 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { X } from 'lucide-react';
 import { dateLabel, dollars, ReviewOptions, type ReviewChoice, type ReviewTerms } from '../review/review-options';
 import { DeadlinePicker } from './deadline-picker';
-
-type Proposal = ReviewTerms & { originalScope: string[]; token?: string; published?: boolean };
-type Decision = Omit<Proposal, 'token' | 'published'> & { choice: ReviewChoice; recordedAt: string };
-export type ScopeChange = { deliverables: string[]; pending?: Proposal; history: Decision[] };
-type ReviewDecision = { choice: ReviewChoice; decidedAt: string };
+import { applyScopeDecision, type ScopeChange } from '../lib/client-board';
 
 export async function scopeReviewRequest(body: object) {
   const response = await fetch('/api/scope-review', {
@@ -20,24 +16,12 @@ export async function scopeReviewRequest(body: object) {
   return data;
 }
 
-export function applyScopeDecision(scope: ScopeChange, choice: ReviewChoice, recordedAt: string) {
-  const pending = scope.pending;
-  if (!pending) return null;
-  const { token, published, ...terms } = pending;
-  const deliverables = choice === 'swap'
-    ? terms.originalScope.map(item => item === terms.replaced ? terms.requested : item)
-    : [...terms.originalScope, terms.requested];
-  return {
-    scope: { deliverables, history: [{ ...terms, choice, recordedAt }, ...scope.history] },
-    deadline: choice === 'add' ? terms.newDeadline : terms.originalDeadline,
-  };
-}
-
-export function ScopeChangePanel({ project, deadline, scope, onSave, onClose }: {
+export function ScopeChangePanel({ project, deadline, scope, onSave, onRefresh, onClose }: {
   project: string;
   deadline: string;
   scope?: ScopeChange;
-  onSave: (scope: ScopeChange, deadline?: string) => boolean;
+  onSave: (scope: ScopeChange, deadline?: string) => Promise<boolean>;
+  onRefresh: () => Promise<void>;
   onClose: () => void;
 }) {
   const [error, setError] = useState('');
@@ -52,20 +36,15 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onClose }: 
   async function publish() {
     if (!pending || busy || deadline !== pending.originalDeadline) return;
     const token = pending.token ?? crypto.randomUUID() + crypto.randomUUID();
-    if (!pending.token && !onSave({ deliverables: pending.originalScope, pending: { ...pending, token }, history })) return;
     setBusy(true);
     setError('');
     try {
+      if (!pending.token && !await onSave({ deliverables: pending.originalScope, pending: { ...pending, token }, history })) return;
       const { requested, replaced, originalDeadline, extraCents, newDeadline } = pending;
       const proposal = { requested, replaced, originalDeadline, extraCents, newDeadline };
       const { review } = await scopeReviewRequest({ action: 'publish', token, project, proposal });
-      if (review.choice && scope) {
-        const decision = review as ReviewDecision;
-        const updated = applyScopeDecision(scope, decision.choice, decision.decidedAt);
-        if (updated) onSave(updated.scope, updated.deadline);
-        return;
-      }
-      if (!pending.published && !onSave({ deliverables: pending.originalScope, pending: { ...pending, token, published: true }, history })) return;
+      await onRefresh();
+      if (review.choice) return;
       try {
         await navigator.clipboard.writeText(`${window.location.origin}/review#${token}`);
         setCopied(true);
@@ -85,7 +64,8 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onClose }: 
     setError('');
     try {
       await scopeReviewRequest({ action: 'revoke', token: pending.token });
-      if (onSave({ deliverables: pending.originalScope, pending: { ...pending, token: undefined, published: undefined }, history })) setCopied(false);
+      await onRefresh();
+      setCopied(false);
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : 'Could not revoke the review.');
     } finally {
@@ -95,7 +75,7 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onClose }: 
 
   const approvedExtras = history.reduce((total, decision) => total + (decision.choice === 'add' ? decision.extraCents : 0), 0);
 
-  function saveProposal(event: FormEvent<HTMLFormElement>) {
+  async function saveProposal(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const requested = String(data.get('requested')).trim();
@@ -115,17 +95,20 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onClose }: 
       setError('Choose a date for the add-on on or after the current deadline.');
       return;
     }
-    if (onSave({
+    setBusy(true);
+    const saved = await onSave({
       deliverables: originalScope,
       pending: { requested, replaced, originalScope, originalDeadline: deadline, extraCents, newDeadline },
       history,
-    })) setError('');
+    });
+    setBusy(false);
+    if (saved) setError('');
   }
 
-  function recordDecision() {
+  async function recordDecision() {
     if (!scope || !selected || pending?.token) return;
     const updated = applyScopeDecision(scope, selected, new Date().toISOString());
-    if (updated && onSave(updated.scope, updated.deadline)) {
+    if (updated && await onSave(updated.scope, updated.deadline)) {
       setSelected(null);
       setError('');
     }
@@ -149,10 +132,10 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onClose }: 
           {deadline !== pending.originalDeadline && <p role="status">The deadline changed after this proposal was drafted. Discard it and create a new proposal with the updated date.</p>}
           <div className="client-editor-actions scope-actions">
             {pending.token ? <button type="button" disabled={busy} onClick={revoke}>Revoke link</button> : <>
-              <button type="button" onClick={() => {
-                if (onSave({ deliverables: pending.originalScope, history })) setSelected(null);
+              <button type="button" disabled={busy} onClick={async () => {
+                if (await onSave({ deliverables: pending.originalScope, history })) setSelected(null);
               }}>Discard proposal</button>
-              <button type="button" disabled={!selected || deadline !== pending.originalDeadline} onClick={recordDecision}>Record approval</button>
+              <button type="button" disabled={busy || !selected || deadline !== pending.originalDeadline} onClick={recordDecision}>Record approval</button>
             </>}
             <button type="button" className="client-board-primary" disabled={busy || deadline !== pending.originalDeadline} onClick={publish}>
               {busy ? 'Working…' : pending.published ? 'Copy review link' : 'Create and copy link'}
@@ -171,7 +154,7 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onClose }: 
             <DeadlinePicker name="newDeadline" label="Add-on deadline" initialValue={deadline} />
           </div>
           {error && <p role="alert">{error}</p>}
-          <div className="client-editor-actions"><button type="submit" className="client-board-primary">Compare options</button></div>
+          <div className="client-editor-actions"><button type="submit" className="client-board-primary" disabled={busy}>Compare options</button></div>
         </form>
       )}
       {history.length > 0 && <section className="scope-history" aria-label="Approval history">

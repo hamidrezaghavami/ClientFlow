@@ -4,12 +4,10 @@ import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'rea
 import { Archive, ArrowLeftRight, ArrowUpRight, CalendarDays, ChevronRight, Handshake, LayoutGrid, ListTodo, RotateCcw, Search, Sparkles, UserPlus, X } from 'lucide-react';
 import { ClientAssistant } from './client-assistant';
 import { DeadlinePicker } from './deadline-picker';
-import { applyScopeDecision, scopeReviewRequest, ScopeChangePanel, type ScopeChange } from './scope-change';
+import { ScopeChangePanel } from './scope-change';
+import { boardSchema, stages, type Board, type Engagement } from '../lib/client-board';
 
-const stages = ['New', 'In progress', 'In review', 'Delivered'] as const;
-type Stage = (typeof stages)[number];
-type ActionOwner = 'me' | 'client';
-type Engagement = { id: string; client: string; project: string; contact: string; deadline: string; stage: Stage; nextAction?: string; actionOwner?: ActionOwner; followUp?: string; scope?: ScopeChange; archived?: boolean };
+type Stage = Engagement["stage"];
 
 const initialClients: Engagement[] = [
   { id: 'atlas', client: 'Atlas Ventures', project: 'Investor pitch deck', contact: 'Sofia Reed', deadline: '2026-11-18', stage: 'New', nextAction: 'Confirm the pitch deck scope', actionOwner: 'client', followUp: '2026-11-12' },
@@ -32,6 +30,7 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
   const [scopeId, setScopeId] = useState<string | null>(null);
   const scopeClient = clients.find(item => item.id === scopeId);
   const scopeDialog = useRef<HTMLDialogElement>(null);
+  const editorOriginal = useRef<Engagement | undefined>(undefined);
   const [draft, setDraft] = useState<Engagement | null>(null);
   const [announcement, setAnnouncement] = useState('');
   const [today, setToday] = useState('');
@@ -61,75 +60,90 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
     setToday(localDate.toISOString().slice(0, 10));
   }, []);
 
-  useEffect(() => {
-    function loadBoard() {
-      try {
-        const saved = window.localStorage.getItem(storageKey);
-        setClients(saved ? JSON.parse(saved) as Engagement[] : initialClients);
-        setSaveError('');
-        setReady(true);
-      } catch {
-        setSaveError('Saved board unavailable. Check browser storage and reload.');
-        setReady(false);
-      }
-    }
-    function syncBoard(event: StorageEvent) {
-      if (event.key === storageKey || event.key === null) loadBoard();
-    }
-    loadBoard();
-    window.addEventListener('storage', syncBoard);
-    return () => window.removeEventListener('storage', syncBoard);
-  }, [storageKey]);
+  const boardRef = useRef<Board | null>(null);
+  const saving = useRef(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  function persistClient(updated: Engagement) {
-    if (!ready) return false;
-    try {
-      const saved = window.localStorage.getItem(storageKey);
-      const board: Engagement[] = saved ? JSON.parse(saved) : initialClients;
-      const next = board.some(item => item.id === updated.id)
-        ? board.map(item => item.id === updated.id ? updated : item)
-        : [...board, updated];
-      window.localStorage.setItem(storageKey, JSON.stringify(next));
-      setClients(next);
-      setSaveError('');
-      return true;
-    } catch {
-      setSaveError('Could not save. Check browser storage and try again.');
-      return false;
-    }
+  function receiveBoard(board: Board) {
+    if (boardRef.current && board.revision <= boardRef.current.revision) return;
+    boardRef.current = board;
+    setClients(board.clients);
+    setReady(true);
   }
 
-  const syncApproval = useEffectEvent(async (token: string) => {
-    const { review } = await scopeReviewRequest({ action: 'status', token });
-    if (!review) return;
-    const saved = window.localStorage.getItem(storageKey);
-    const board: Engagement[] = saved ? JSON.parse(saved) : initialClients;
-    const client = board.find(item => item.scope?.pending?.token === token);
-    if (!client?.scope?.pending) return;
-    if (review.revoked) {
-      persistClient({ ...client, scope: { ...client.scope, pending: { ...client.scope.pending, token: undefined, published: undefined } } });
-      return;
+  async function boardRequest(body: object, signal?: AbortSignal) {
+    const timeout = AbortSignal.timeout(12_000);
+    const response = await fetch('/api/client-board', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body), signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+    });
+    const result = await response.json() as { board?: Board | null; error?: string };
+    return { ok: response.ok, ...result };
+  }
+
+  async function refreshBoard(signal?: AbortSignal) {
+    let result = await boardRequest({ action: 'load' }, signal);
+    if (result.ok && !result.board) {
+      let initial = initialClients;
+      try {
+        const saved = window.localStorage.getItem(storageKey);
+        if (saved) {
+          const parsed = boardSchema.safeParse(JSON.parse(saved));
+          if (parsed.success) initial = parsed.data;
+        }
+      } catch {
+        // Browser storage is optional after migration.
+      }
+      result = await boardRequest({ action: 'load', initial }, signal);
     }
-    if (!review.choice || !review.decidedAt) return;
-    const update = applyScopeDecision(client.scope, review.choice, review.decidedAt);
-    if (update && persistClient({ ...client, ...update })) {
-      setAnnouncement(`Client approval received for ${client.project}.`);
+    if (!result.ok || !result.board) throw new Error(result.error ?? 'Could not load your board.');
+    if (signal?.aborted) return;
+    receiveBoard(result.board);
+  }
+
+  const pollBoard = useEffectEvent(async (signal: AbortSignal) => {
+    if (saving.current || signal.aborted) return;
+    try {
+      const wasReady = Boolean(boardRef.current);
+      await refreshBoard(signal);
+      if (!wasReady && !signal.aborted) setSaveError('');
+    } catch {
+      if (!signal.aborted && !boardRef.current) setSaveError('Could not load your board. Retrying shortly.');
     }
   });
-  const pendingTokens = clients.flatMap(item => item.scope?.pending?.token ?? []).join(',');
+
   useEffect(() => {
-    if (!ready || !pendingTokens) return;
-    function check() {
-      void Promise.allSettled(pendingTokens.split(',').map(token => syncApproval(token)));
-    }
+    const controller = new AbortController();
+    const check = () => { void pollBoard(controller.signal); };
     check();
-    const interval = window.setInterval(check, 10_000);
+    const interval = window.setInterval(check, 8_000);
     window.addEventListener('focus', check);
     return () => {
+      controller.abort();
       window.clearInterval(interval);
       window.removeEventListener('focus', check);
     };
-  }, [ready, pendingTokens]);
+  }, [storageKey]);
+
+  async function persistClient(updated: Engagement) {
+    const board = boardRef.current;
+    if (!board || saving.current) return false;
+    saving.current = true;
+    setIsSaving(true);
+    try {
+      const result = await boardRequest({ action: 'save', revision: board.revision, client: updated });
+      if (result.board) receiveBoard(result.board);
+      if (!result.ok || !result.board) throw new Error(result.error ?? 'Could not save your change.');
+      setSaveError('');
+      return true;
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Could not save your change.');
+      return false;
+    } finally {
+      saving.current = false;
+      setIsSaving(false);
+    }
+  }
 
   const actionPanel = useRef<HTMLDialogElement>(null);
   const archive = useRef<HTMLDialogElement>(null);
@@ -147,10 +161,12 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
 
   function openEditor(client?: Engagement) {
     if (!ready) return;
+    editorOriginal.current = client;
+    setSaveError('');
     setDraft(client ?? { id: '', client: '', project: '', contact: '', deadline: '', stage: 'New' });
   }
 
-  function saveClient(event: FormEvent<HTMLFormElement>) {
+  async function saveClient(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!draft) return;
     const data = new FormData(event.currentTarget);
@@ -166,7 +182,11 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
     }
     const stage = stages.find(item => item === data.get('stage')) ?? draft.stage;
     const actionOwner = data.get('actionOwner') === 'client' ? 'client' : 'me';
-    const current = clients.find(item => item.id === draft.id) ?? draft;
+    const current = boardRef.current?.clients.find(item => item.id === draft.id) ?? draft;
+    if (draft.id && JSON.stringify(current) !== JSON.stringify(editorOriginal.current)) {
+      setSaveError('This engagement changed on another device. Reopen it to edit the latest version.');
+      return;
+    }
     const updated: Engagement = {
       ...current,
       id: draft.id || crypto.randomUUID(), client, project, stage,
@@ -174,14 +194,14 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
       nextAction: String(data.get('nextAction')).trim(), actionOwner,
       followUp: actionOwner === 'client' ? String(data.get('followUp') ?? '') : '',
     };
-    if (!persistClient(updated)) return;
+    if (!await persistClient(updated)) return;
     setAnnouncement(`${client} saved in ${stage}.`);
     dialog.current?.close();
   }
 
-  function moveClient(id: string, stage: Stage) {
+  async function moveClient(id: string, stage: Stage) {
     const client = clients.find(item => item.id === id);
-    if (client && persistClient({ ...client, stage })) setAnnouncement(`${client.client} moved to ${stage}.`);
+    if (client && await persistClient({ ...client, stage })) setAnnouncement(`${client.client} moved to ${stage}.`);
   }
 
   return (
@@ -243,10 +263,10 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
                         </button>
                         <label className="client-board-stage">
                           <span>Stage</span>
-                          <select id={`client-stage-control-${item.id}`} value={item.stage} aria-label={`Stage for ${item.client}`} onChange={event => {
+                          <select id={`client-stage-control-${item.id}`} value={item.stage} disabled={isSaving} aria-label={`Stage for ${item.client}`} onChange={async event => {
                             const next = stages.find(value => value === event.target.value);
                             if (next) {
-                              moveClient(item.id, next);
+                              await moveClient(item.id, next);
                               requestAnimationFrame(() => document.getElementById(`client-stage-control-${item.id}`)?.focus());
                             }
                           }}>
@@ -262,7 +282,7 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
           })}
         </div>}
         <p className="client-board-note" role={saveError ? 'alert' : undefined}>
-          {saveError || (ready ? 'Changes are saved in this browser.' : 'Loading your board…')}
+          {saveError || (ready ? 'Changes sync across your signed-in devices.' : 'Loading your board…')}
         </p>
         <p className="sr-only" role="status">{announcement}</p>
       </section>
@@ -338,8 +358,8 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
         {archivedClients.length ? <ul className="client-archive-list">
           {archivedClients.map(item => <li key={item.id} className="deadline-panel-item client-archive-item" data-stage={stages.indexOf(item.stage)}>
             <span><strong>{item.client}</strong><small>{item.project} · {item.stage}</small></span>
-            <button type="button" onClick={() => {
-              if (persistClient({ ...item, archived: false })) setAnnouncement(`${item.client} restored to ${item.stage}.`);
+            <button type="button" disabled={isSaving} onClick={async () => {
+              if (await persistClient({ ...item, archived: false })) setAnnouncement(`${item.client} restored to ${item.stage}.`);
             }} aria-label={`Restore ${item.client}`}><RotateCcw size={14} aria-hidden="true" /> Restore</button>
           </li>)}
         </ul> : <p className="deadline-panel-empty">No archived engagements.</p>}
@@ -349,6 +369,7 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
       <dialog ref={scopeDialog} className="client-editor scope-dialog" aria-labelledby="scope-title" onClose={() => setScopeId(null)}>
         {scopeClient && <ScopeChangePanel key={scopeClient.id} project={scopeClient.project} deadline={scopeClient.deadline} scope={scopeClient.scope}
           onSave={(scope, deadline) => persistClient({ ...scopeClient, scope, deadline: deadline ?? scopeClient.deadline })}
+          onRefresh={refreshBoard}
           onClose={() => scopeDialog.current?.close()} />}
         {saveError && <p role="alert">{saveError}</p>}
       </dialog>
@@ -383,13 +404,13 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
             <label>Stage<select name="stage" defaultValue={draft.stage}>{stages.map(stage => <option key={stage}>{stage}</option>)}</select></label>
             {saveError && <p role="alert">{saveError}</p>}
             <div className="client-editor-actions">
-              {draft.id && <button type="button" className="client-archive-action" onClick={() => {
-                if (!persistClient({ ...(clients.find(item => item.id === draft.id) ?? draft), archived: true })) return;
+              {draft.id && <button type="button" className="client-archive-action" disabled={isSaving} onClick={async () => {
+                if (!await persistClient({ ...(clients.find(item => item.id === draft.id) ?? draft), archived: true })) return;
                 setAnnouncement(`${draft.client} archived.`);
                 dialog.current?.close();
               }}><Archive size={15} aria-hidden="true" /> Archive</button>}
               <button type="button" onClick={() => dialog.current?.close()}>Cancel</button>
-              <button type="submit" className="client-board-primary">Save client</button>
+              <button type="submit" className="client-board-primary" disabled={isSaving}>{isSaving ? 'Saving…' : 'Save client'}</button>
             </div>
           </form>
         )}

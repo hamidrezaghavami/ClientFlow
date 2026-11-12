@@ -1,5 +1,8 @@
 import express from 'express';
-import { verifyClerkSession } from './clerk-session.js';
+import { fileURLToPath } from 'node:url';
+import { clientBoard } from './client-board.js';
+import { scopeReview } from './scope-review.js';
+import { authenticate } from './clerk-session.js';
 import { rateLimit } from 'express-rate-limit';
 import { z } from 'zod';
 
@@ -20,52 +23,47 @@ const assistantInput = z.object({
 
 app.disable('x-powered-by');
 app.get('/health', (_req, res) => { res.json({ status: 'ok' }); });
-app.use('/assistant', (req, res, next) => {
+app.use(['/assistant', '/client-board', '/scope-review'], (req, res, next) => {
   const origin = req.get('Origin');
   res.vary('Origin');
   res.set('Cache-Control', 'no-store');
-  if (!origin || !allowedOrigins.includes(origin)) {
+  if (origin && !allowedOrigins.includes(origin)) {
     res.status(403).json({ error: 'This origin is not allowed.' });
     return;
   }
-  res.set({
+  if (origin) res.set({
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Headers': 'Authorization, Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   });
   if (req.method === 'OPTIONS') { res.sendStatus(204); return; }
-  if (!req.get('Authorization')?.startsWith('Bearer ')) {
-    res.status(401).json({ error: 'Sign in to use the assistant.' });
-    return;
-  }
   next();
 });
+
+async function requireSession(req, res, next) {
+  const userId = await authenticate(req);
+  if (!userId) {
+    res.status(401).json({ error: 'Your session could not be verified. Sign in again.' });
+    return;
+  }
+  res.locals.userId = userId;
+  next();
+}
+
+app.post('/client-board', requireSession, express.json({ limit: '2mb' }), clientBoard);
+app.post('/scope-review', express.json({ limit: '8kb' }), scopeReview);
 
 const assistantLimit = rateLimit({
   windowMs: 60_000,
   limit: 5,
-  keyGenerator: (_req, res) => res.locals.assistantUserId,
+  keyGenerator: (_req, res) => res.locals.userId,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Please wait a minute before asking again.' },
 });
 
 app.post('/assistant',
-  async (req, res, next) => {
-    const token = req.get('Authorization')?.slice('Bearer '.length);
-    const origin = req.get('Origin');
-    try {
-      const userId = token && origin ? await verifyClerkSession(token, origin) : null;
-      if (userId) {
-        res.locals.assistantUserId = userId;
-        next();
-        return;
-      }
-    } catch {
-      // Keep token and verification details out of the response.
-    }
-    res.status(401).json({ error: 'Your session could not be verified. Sign in again.' });
-  },
+  requireSession,
   assistantLimit,
   express.json({ limit: '16kb' }),
   async (req, res) => {
@@ -99,9 +97,7 @@ app.post('/assistant',
         return;
       }
       if (!response.ok) {
-        const failure = await response.json().catch(() => null) as {
-          error?: { status?: string; details?: { reason?: string }[] };
-        } | null;
+        const failure = await response.json().catch(() => null);
         const reason = failure?.error?.details?.find(detail => detail.reason)?.reason;
         const safeReason = reason && /^[A-Z_]{1,64}$/.test(reason) ? reason : undefined;
         console.warn('Gemini rejected the request', { status: response.status, reason: safeReason });
@@ -113,7 +109,7 @@ app.post('/assistant',
         res.status(502).json({ error: message });
         return;
       }
-      const result = await response.json() as { candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[] };
+      const result = await response.json();
       const answer = result.candidates?.[0]?.content?.parts?.filter(part => !part.thought).map(part => part.text ?? '').join('').trim();
       if (!answer) {
         res.status(422).json({ error: 'Gemini returned no answer. Try rephrasing your question.' });
@@ -130,5 +126,14 @@ app.post('/assistant',
   },
 );
 
-const port = Number(process.env.PORT ?? 3001);
-app.listen(port, process.env.HOST ?? '127.0.0.1', () => console.log(`ClientFlow API listening on ${port}`));
+app.use((error, _req, res, _next) => {
+  const status = error.status === 413 ? 413 : error.status === 400 ? 400 : 500;
+  res.status(status).json({ error: status === 413 ? 'Request is too large.' : status === 400 ? 'Invalid JSON request.' : 'The API could not process this request.' });
+});
+
+export default app;
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const port = Number(process.env.PORT ?? 3001);
+  app.listen(port, process.env.HOST ?? '127.0.0.1', () => console.log(`ClientFlow API listening on ${port}`));
+}

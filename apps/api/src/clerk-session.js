@@ -6,7 +6,7 @@ const host = /^([a-z0-9.-]+)\$$/.exec(frontend)?.[1];
 const issuer = host ? `https://${host}` : null;
 const keys = issuer ? createRemoteJWKSet(new URL('/.well-known/jwks.json', issuer), { timeoutDuration: 5000 }) : null;
 
-export async function verifyClerkSession(token: string, origin: string): Promise<string | null> {
+export async function verifyClerkSession(token, origin) {
   if (!issuer || !keys) return null;
   const { payload } = await jwtVerify(token, keys, {
     algorithms: ['RS256'],
@@ -20,4 +20,16 @@ export async function verifyClerkSession(token: string, origin: string): Promise
     payload.azp !== origin || (payload.sts !== undefined && payload.sts !== 'active')
   ) return null;
   return payload.sub;
+}
+
+
+export async function authenticate(req) {
+  const origin = req.get('Origin');
+  const authorization = req.get('Authorization');
+  if (!origin || !authorization?.startsWith('Bearer ')) return null;
+  try {
+    return await verifyClerkSession(authorization.slice('Bearer '.length), origin);
+  } catch {
+    return null;
+  }
 }

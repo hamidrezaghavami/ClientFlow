@@ -325,12 +325,6 @@
   border-radius: 18px;
   background: #f4e9db;
 }
-.client-tool-label {
-  font-size: 10px;
-  text-align: center;
-  font-weight: 600;
-  color: var(--board-muted);
-}
 .client-tool-rail a {
   display: grid;
   width: 44px;

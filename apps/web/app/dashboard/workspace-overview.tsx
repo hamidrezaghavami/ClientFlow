@@ -199,7 +199,6 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
   return (
     <main id="workspace-main" className="client-board-shell">
       <nav className="client-tool-rail" aria-label="Client Board">
-        <span className="client-tool-label">Client Board</span>
         <a href="#client-board-title" aria-label="Client stages" title="Client stages"><LayoutGrid size={19} aria-hidden="true" /></a>
         <button type="button" disabled={!ready} aria-label="Due next" title="Due next" aria-haspopup="dialog" onClick={() => deadlines.current?.showModal()}><CalendarDays size={19} aria-hidden="true" /></button>
         <button type="button" disabled={!ready} className="client-tool-add" aria-label="Add client" title="Add client"

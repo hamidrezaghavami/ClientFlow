@@ -94,7 +94,7 @@ export function WorkspaceOverview() {
           {stages.map((stage, index) => {
             const items = clients.filter(item => item.stage === stage);
             return (
-              <section className="client-board-column" key={stage} aria-labelledby={`client-stage-${index}`}>
+              <section className="client-board-column" data-stage={index} key={stage} aria-labelledby={`client-stage-${index}`}>
                 <h2 id={`client-stage-${index}`}><i data-stage={index} aria-hidden="true" />{stage}<span>{items.length}</span></h2>
                 {items.length === 0 && <p className="client-board-empty">No clients here yet.</p>}
                 {items.map(item => (

@@ -216,3 +216,47 @@
 .deadline-calendar button[aria-pressed="true"] { background: #ca9ff9; color: #1b1026; }
 .deadline-calendar-footer { border-top: 1px solid var(--board-border); margin-top: 6px; padding-top: 4px; color: #e1c3ff; }
 .deadline-calendar-footer button { padding-inline: 10px; }
+
+.client-board-column {
+  --stage-accent: #a9c9fa;
+  --stage-card: #262d38;
+  --stage-edge: #4a607a;
+  --stage-chip: #34455e;
+  background: #1c1d24;
+  border-color: #3b3d47;
+}
+.client-board-column[data-stage="1"] {
+  --stage-accent: #f3b69c;
+  --stage-card: #342b2b;
+  --stage-edge: #735548;
+  --stage-chip: #553a33;
+}
+.client-board-column[data-stage="2"] {
+  --stage-accent: #efd093;
+  --stage-card: #332e25;
+  --stage-edge: #716143;
+  --stage-chip: #51442e;
+}
+.client-board-column[data-stage="3"] {
+  --stage-accent: #9fd9c5;
+  --stage-card: #253330;
+  --stage-edge: #47685d;
+  --stage-chip: #314c44;
+}
+.client-board-column h2 i[data-stage] { background: var(--stage-accent); }
+.client-board-column .client-board-card { background: var(--stage-card); border-color: var(--stage-edge); }
+.client-board-column .client-board-stage { border-color: var(--stage-edge); }
+.client-board-column .client-board-stage select {
+  background: var(--stage-chip);
+  border-color: var(--stage-edge);
+  color: #faf6f2;
+}
+.client-board-column .client-board-avatar,
+.client-board-column .client-board-card-title svg {
+  color: var(--stage-accent);
+  background: var(--stage-chip);
+}
+.client-board-column .client-board-card-title:hover svg { background: var(--stage-edge); }
+.client-board-column :is(.client-board-card-meta, .client-board-stage, .client-board-card-title small) {
+  color: #d7d2d4;
+}

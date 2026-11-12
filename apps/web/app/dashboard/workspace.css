@@ -97,3 +97,47 @@
   .workspace-account > span { display: none; }
   .workspace-account { padding: 4px; }
 }
+
+/* Keep native keyboard and touch behavior while styling the picker in browsers that support it. */
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .workspace :is(.client-board-stage, .client-editor) select,
+  .workspace :is(.client-board-stage, .client-editor) select::picker(select) {
+    appearance: base-select;
+  }
+
+  .workspace :is(.client-board-stage, .client-editor) select::picker(select) {
+    margin-block-start: 6px;
+    min-width: 150px;
+    padding: 5px;
+    border: 1px solid #5d476c;
+    border-radius: 15px;
+    background: #251a31;
+    color: var(--board-ink);
+    box-shadow: 0 12px 30px #10091680;
+  }
+
+  .workspace :is(.client-board-stage, .client-editor) option {
+    min-height: 36px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    font-size: 13px;
+  }
+
+  .workspace :is(.client-board-stage, .client-editor) option:checked {
+    background: #3f2a53;
+    color: #f2defe;
+  }
+
+  .workspace :is(.client-board-stage, .client-editor) option:is(:hover, :focus-visible) {
+    background: #503567;
+    color: white;
+  }
+
+  .workspace :is(.client-board-stage, .client-editor) option::checkmark {
+    color: #d3abff;
+  }
+
+  .workspace :is(.client-board-stage, .client-editor) select::picker-icon {
+    color: #d3abff;
+  }
+}

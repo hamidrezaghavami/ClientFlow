@@ -25,9 +25,12 @@ export default async function DashboardPage() {
             <UserButton appearance={{
               options: { unsafe_disableDevelopmentModeWarnings: true },
               elements: {
-                userButtonPopoverActionButton: { color: '#26231f', '&:hover': { backgroundColor: '#f4e9db' } },
-                userButtonPopoverActionButtonText: { color: '#26231f' },
-                userButtonPopoverActionButtonIcon: { color: '#634b36' },
+                userButtonPopoverActionButton: {
+                  color: '#26231f',
+                  '&:is(:hover, :focus-visible, :active)': { backgroundColor: '#f4e9db', color: '#26231f' },
+                },
+                userButtonPopoverActionButtonText: { color: '#26231f !important' },
+                userButtonPopoverActionButtonIcon: { color: '#634b36 !important' },
               },
             }} />
           </div>

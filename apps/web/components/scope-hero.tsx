@@ -1,13 +1,10 @@
 import Link from 'next/link';
-import { useState } from 'react';
-import { ArrowDown, ArrowLeftRight, ArrowUpRight, CalendarDays, Check, FileCheck2, Link2, MessageSquare, MousePointer2, Pause, Play, Plus, Send } from 'lucide-react';
+import { ArrowDown, ArrowLeftRight, ArrowUpRight, CalendarDays, Check, FileCheck2, Link2, MessageSquare, MousePointer2, Plus, Send } from 'lucide-react';
 
 export function ScopeHero({ onTour }: { onTour: () => void }) {
-  const [paused, setPaused] = useState(false);
-
   return (
     <section className="scope-hero" aria-labelledby="landing-title">
-      <div className="scope-hero-stage" data-motion-paused={paused}>
+      <div className="scope-hero-stage">
         <h1 id="landing-title">
           <span>Client work</span>
           <span>from brief</span>
@@ -47,13 +44,7 @@ export function ScopeHero({ onTour }: { onTour: () => void }) {
         <Link className="scope-hero-cta" href="/sign-up">Get started <ArrowUpRight aria-hidden="true" size={21} /></Link>
         <button className="scope-hero-tour" onClick={onTour}>Take a tour <ArrowUpRight aria-hidden="true" size={14} /></button>
       </div>
-      <div className="scope-hero-controls">
-        <a className="scope-hero-down" href="#features" aria-label="See how ClientFlow works"><ArrowDown size={18} aria-hidden="true" /></a>
-        <button type="button" className="scope-hero-motion" onClick={() => setPaused(value => !value)}
-          aria-label={paused ? 'Play hero motion' : 'Pause hero motion'} title={paused ? 'Play motion' : 'Pause motion'}>
-          {paused ? <Play size={15} aria-hidden="true" /> : <Pause size={15} aria-hidden="true" />}
-        </button>
-      </div>
+      <a className="scope-hero-down" href="#features" aria-label="See how ClientFlow works"><ArrowDown size={18} aria-hidden="true" /></a>
     </section>
   );
 }

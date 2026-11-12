@@ -152,13 +152,6 @@
   --turn: -12deg; --from-x: 25px; --from-y: -28px;
   right: 4%; top: -22%; background: #f8f2e6; color: #305b43;
 }
-.scope-hero-controls { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; }
-.scope-hero-controls .scope-hero-down { margin: 0; }
-.scope-hero-motion {
-  display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
-  border: 1px solid var(--line); border-radius: 50%; color: var(--landing-muted);
-}
-.scope-hero-motion:hover { background: #e7e3da; }
 @media (prefers-reduced-motion: no-preference) {
   .scope-hero-tile, .scope-hero-sticker {
     animation: scope-card-in 900ms cubic-bezier(.19,.8,.27,1) var(--entrance, 130ms) both,
@@ -170,15 +163,11 @@
   .scope-hero-calendar { --entrance: 235ms; --drift-x: -3px; --drift-y: -9px; --drift-turn: -2deg; --drift-time: 6.1s; }
   .scope-hero-approved { --entrance: 360ms; --drift-x: 3px; --drift-y: -7px; --drift-turn: 2deg; --drift-time: 5.3s; }
   .scope-hero-sticker { --entrance: 480ms; --drift-x: 2px; --drift-y: -6px; --drift-turn: -4deg; --drift-time: 4.9s; }
-  .scope-hero-stage[data-motion-paused="true"] :is(.scope-hero-tile, .scope-hero-sticker, .scope-hero-tray, h1 > *) {
-    animation-play-state: paused;
-  }
   @keyframes scope-card-drift {
     0%, 100% { translate: 0; rotate: 0deg; }
     50% { translate: var(--drift-x) var(--drift-y); rotate: var(--drift-turn); }
   }
 }
-@media (prefers-reduced-motion: reduce) { .scope-hero-motion { display: none; } }
 @media (max-width: 900px) {
   .scope-hero-pointer { left: 16%; bottom: -7%; }
   .scope-hero-send { top: -7%; left: 38%; }

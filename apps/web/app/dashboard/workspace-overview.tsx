@@ -93,7 +93,7 @@ export function WorkspaceOverview() {
               const overdue = today && item.deadline < today;
               return (
                 <li key={item.id}>
-                  <button type="button" className="deadline-panel-item" onClick={() => openEditor(item)}
+                  <button type="button" className="deadline-panel-item" data-stage={stages.indexOf(item.stage)} onClick={() => openEditor(item)}
                     aria-label={`Edit ${item.project} for ${item.client}, due ${formatDeadline(item.deadline)}${overdue ? ', overdue' : ''}`}>
                     <span>
                       <span className={overdue ? 'deadline-panel-date is-overdue' : 'deadline-panel-date'}>

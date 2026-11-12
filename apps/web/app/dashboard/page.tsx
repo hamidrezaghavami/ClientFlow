@@ -3,19 +3,29 @@ import { auth } from '@clerk/nextjs/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { clerkConfigured } from '../../auth-config';
+import { WorkspaceOverview } from './workspace-overview';
+import './workspace.css';
 
 export default async function DashboardPage() {
   if (!clerkConfigured) redirect('/sign-in');
   await auth.protect();
 
   return (
-    <main className="account-shell">
-      <Link href="/" className="account-home">← ClientFlow</Link>
-      <section className="account-summary">
-        <UserButton />
-        <h1>Welcome to ClientFlow</h1>
-        <p>You’re signed in. Your client and project workspace is coming next.</p>
-      </section>
-    </main>
+    <div className="workspace">
+      <a className="skip-link" href="#workspace-main">Skip to dashboard</a>
+      <header className="workspace-header">
+        <div className="workspace-width workspace-header-inner">
+          <Link href="/" className="brand" aria-label="ClientFlow home">
+            <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
+            clientflow
+          </Link>
+          <div className="workspace-account">
+            <span>My workspace</span>
+            <UserButton />
+          </div>
+        </div>
+      </header>
+      <WorkspaceOverview />
+    </div>
   );
 }

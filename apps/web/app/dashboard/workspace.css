@@ -141,3 +141,30 @@
     color: #d3abff;
   }
 }
+
+.client-board-stage select {
+  box-sizing: border-box;
+  width: 106px;
+  padding: 0 9px;
+  line-height: 1.2;
+  text-align: center;
+  text-align-last: center;
+}
+
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .workspace .client-board-stage select {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .workspace .client-board-stage select::picker-icon {
+    margin: 0;
+    line-height: 1;
+  }
+
+  .workspace .client-board-stage option {
+    text-align: start;
+  }
+}

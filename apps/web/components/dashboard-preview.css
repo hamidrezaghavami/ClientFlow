@@ -33,10 +33,10 @@
 .dashboard-preview-body { display: flex; align-items: flex-start; padding: 12px 12px 42px; gap: 10px; }
 .dashboard-preview-rail {
   display: flex; flex-direction: column; align-items: center; flex: none; gap: 5px;
-  padding: 4px; border-radius: 12px; background: #2c2823; color: #f7ece0;
+  padding: 4px; border: 1px solid #e1d1bf; border-radius: 12px; background: #f4e9db; color: #634b36;
 }
 .dashboard-preview-rail svg { width: 25px; height: 25px; padding: 6px; border-radius: 7px; }
-.dashboard-preview-rail .dashboard-preview-active { background: #50483f; }
+.dashboard-preview-rail .dashboard-preview-active { background: #f4d3b9; color: #863711; }
 .dashboard-preview-rail .dashboard-preview-add, .dashboard-preview-assistant { background: #fa6519; color: #25170e; }
 .dashboard-preview-main { flex: 1; min-width: 0; container-type: inline-size; }
 .dashboard-preview-search {

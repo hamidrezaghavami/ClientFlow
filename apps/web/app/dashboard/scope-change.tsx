@@ -1,20 +1,12 @@
 'use client';
 
+import { useAuth } from '@clerk/nextjs';
+import { postApi } from '../lib/api';
 import { useState, type FormEvent } from 'react';
 import { X } from 'lucide-react';
 import { dateLabel, dollars, ReviewOptions, type ReviewChoice, type ReviewTerms } from '../review/review-options';
 import { DeadlinePicker } from './deadline-picker';
 import { applyScopeDecision, type ScopeChange } from '../lib/client-board';
-
-export async function scopeReviewRequest(body: object) {
-  const response = await fetch('/api/scope-review', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body), signal: AbortSignal.timeout(10_000),
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error ?? 'Could not reach the review service.');
-  return data;
-}
 
 export function ScopeChangePanel({ project, deadline, scope, onSave, onRefresh, onClose }: {
   project: string;
@@ -24,6 +16,17 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onRefresh, 
   onRefresh: () => Promise<void>;
   onClose: () => void;
 }) {
+  const { getToken } = useAuth();
+
+  async function scopeReviewRequest(body: object) {
+    const token = await getToken();
+    if (!token) throw new Error('Sign in again to manage review links.');
+    const response = await postApi('scope-review', body, AbortSignal.timeout(10_000), token);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error ?? 'Could not reach the review service.');
+    return data;
+  }
+
   const [error, setError] = useState('');
   const [selected, setSelected] = useState<ReviewChoice | null>(null);
   const [busy, setBusy] = useState(false);

@@ -1,5 +1,6 @@
 'use client';
 
+import { postApi } from '../lib/api';
 import { useEffect, useState } from 'react';
 import { ReviewOptions, type ReviewChoice, type ReviewTerms } from './review-options';
 
@@ -20,10 +21,7 @@ export function ReviewClient() {
     }
     setToken(secret);
     const controller = new AbortController();
-    fetch('/api/scope-review', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'read', token: secret }), signal: controller.signal,
-    }).then(async response => {
+    postApi('scope-review', { action: 'read', token: secret }, controller.signal).then(async response => {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
       setReview(result.review);
@@ -38,10 +36,7 @@ export function ReviewClient() {
     setPending(true);
     setError('');
     try {
-      const response = await fetch('/api/scope-review', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'approve', token, choice: selected }),
-      });
+      const response = await postApi('scope-review', { action: 'approve', token, choice: selected }, AbortSignal.timeout(12_000));
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
       setReview({ ...review, choice: result.review.choice });

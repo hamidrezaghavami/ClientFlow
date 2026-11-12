@@ -5,6 +5,8 @@ import { Archive, ArrowLeftRight, ArrowUpRight, CalendarDays, ChevronRight, Hand
 import { ClientAssistant } from './client-assistant';
 import { DeadlinePicker } from './deadline-picker';
 import { ScopeChangePanel } from './scope-change';
+import { useAuth } from '@clerk/nextjs';
+import { postApi } from '../lib/api';
 import { boardSchema, stages, type Board, type Engagement } from '../lib/client-board';
 
 type Stage = Engagement["stage"];
@@ -22,6 +24,7 @@ function formatDeadline(value: string) {
 }
 
 export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
+  const { getToken } = useAuth();
   const [clients, setClients] = useState(initialClients);
   const [ready, setReady] = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -73,10 +76,9 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
 
   async function boardRequest(body: object, signal?: AbortSignal) {
     const timeout = AbortSignal.timeout(12_000);
-    const response = await fetch('/api/client-board', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body), signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
-    });
+    const token = await getToken();
+    if (!token) throw new Error('Sign in again to access your board.');
+    const response = await postApi('client-board', body, signal ? AbortSignal.any([signal, timeout]) : timeout, token);
     const result = await response.json() as { board?: Board | null; error?: string };
     return { ok: response.ok, ...result };
   }

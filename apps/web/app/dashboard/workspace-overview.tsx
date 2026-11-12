@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { ArrowUpRight, CalendarDays, ChevronRight, Plus, X } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, ChevronRight, LayoutGrid, X } from 'lucide-react';
+import { MovableAddClient } from './movable-add-client';
 import { DeadlinePicker } from './deadline-picker';
 
 const stages = ['New', 'In progress', 'In review', 'Delivered'] as const;
@@ -79,45 +80,20 @@ export function WorkspaceOverview() {
 
   return (
     <main id="workspace-main" className="client-board-shell">
-      <aside className="client-board-sidebar" aria-labelledby="deadline-panel-title">
-        <div className="deadline-panel-heading">
-          <span className="deadline-panel-icon"><CalendarDays size={18} aria-hidden="true" /></span>
-          <div>
-            <h2 id="deadline-panel-title">Due next</h2>
-            <p>{overdueCount ? `${overdueCount} overdue` : 'Client deadlines'}</p>
-          </div>
-        </div>
-        {dueClients.length ? (
-          <ol className="deadline-panel-list">
-            {dueClients.slice(0, 3).map(item => {
-              const overdue = today && item.deadline < today;
-              return (
-                <li key={item.id}>
-                  <button type="button" className="deadline-panel-item" data-stage={stages.indexOf(item.stage)} onClick={() => openEditor(item)}
-                    aria-label={`Edit ${item.project} for ${item.client}, due ${formatDeadline(item.deadline)}${overdue ? ', overdue' : ''}`}>
-                    <span>
-                      <span className={overdue ? 'deadline-panel-date is-overdue' : 'deadline-panel-date'}>
-                        <time dateTime={item.deadline}>{formatDeadline(item.deadline)}</time>{overdue && ' · Overdue'}
-                      </span>
-                      <strong>{item.project}</strong>
-                      <small>{item.client}</small>
-                    </span>
-                    <ChevronRight size={15} aria-hidden="true" />
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        ) : <p className="deadline-panel-empty">No open client deadlines.</p>}
-      </aside>
+      <nav className="client-tool-rail" aria-label="Client Board">
+        <h1>Client Board</h1>
+        <a href="#client-board-title" aria-label="Client stages" title="Client stages"><LayoutGrid size={19} aria-hidden="true" /></a>
+        <a href="#deadline-panel-title" aria-label="Due next" title="Due next"><CalendarDays size={19} aria-hidden="true" /></a>
+      </nav>
+
 
       <section className="client-board-main" aria-labelledby="client-board-title">
         <div className="client-board-heading">
           <div>
-            <h1 id="client-board-title">Client board</h1>
+            <h2 id="client-board-title" tabIndex={-1}>Client engagements</h2>
             <p>Manage each client engagement from first contact to delivery.</p>
           </div>
-          <button type="button" className="client-board-primary" onClick={() => openEditor()}><Plus size={17} /> Add client</button>
+          <MovableAddClient onAdd={() => openEditor()} />
         </div>
         <div className="client-board-columns">
           {stages.map((stage, index) => {
@@ -159,6 +135,38 @@ export function WorkspaceOverview() {
         <p className="client-board-note">Sample workspace. Changes reset when you reload.</p>
         <p className="sr-only" role="status">{announcement}</p>
       </section>
+
+      <aside className="client-board-sidebar" aria-labelledby="deadline-panel-title">
+        <div className="deadline-panel-heading">
+          <span className="deadline-panel-icon"><CalendarDays size={18} aria-hidden="true" /></span>
+          <div>
+            <h2 id="deadline-panel-title" tabIndex={-1}>Due next</h2>
+            <p>{overdueCount ? `${overdueCount} overdue` : 'Client deadlines'}</p>
+          </div>
+        </div>
+        {dueClients.length ? (
+          <ol className="deadline-panel-list">
+            {dueClients.slice(0, 3).map(item => {
+              const overdue = today && item.deadline < today;
+              return (
+                <li key={item.id}>
+                  <button type="button" className="deadline-panel-item" data-stage={stages.indexOf(item.stage)} onClick={() => openEditor(item)}
+                    aria-label={`Edit ${item.project} for ${item.client}, due ${formatDeadline(item.deadline)}${overdue ? ', overdue' : ''}`}>
+                    <span>
+                      <span className={overdue ? 'deadline-panel-date is-overdue' : 'deadline-panel-date'}>
+                        <time dateTime={item.deadline}>{formatDeadline(item.deadline)}</time>{overdue && ' · Overdue'}
+                      </span>
+                      <strong>{item.project}</strong>
+                      <small>{item.client}</small>
+                    </span>
+                    <ChevronRight size={15} aria-hidden="true" />
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        ) : <p className="deadline-panel-empty">No open client deadlines.</p>}
+      </aside>
 
       <dialog ref={dialog} className="client-editor" aria-labelledby="client-editor-title" onClose={() => setDraft(null)}>
         {draft && (

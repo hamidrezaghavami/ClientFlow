@@ -329,3 +329,77 @@
 @media (max-width: 650px) {
   .client-board-sidebar { display: block; grid-row: 2; border-right: 0; border-top: 1px solid var(--board-border); }
 }
+
+.workspace-header { border-bottom: 0; }
+.client-board-shell { grid-template-columns: 76px minmax(0, 1fr); align-items: start; }
+.client-tool-rail {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  position: sticky;
+  top: 14px;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 24px 4px 14px;
+}
+.client-tool-rail h1 {
+  font-size: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--board-muted);
+}
+.client-tool-rail a {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 15px;
+  background: #2a2035;
+  color: #e4d0f7;
+}
+.client-tool-rail a:is(:hover, :focus-visible) { background: #49315d; }
+.client-board-main { grid-column: 2; grid-row: 1; padding-left: 10px; }
+.client-board-heading h2 { font-size: clamp(23px, 3vw, 36px); font-weight: 650; letter-spacing: -.04em; line-height: 1.1; }
+.client-board-sidebar {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0 clamp(20px, 3vw, 40px) 28px 10px;
+  border: 0;
+  border-radius: 22px;
+}
+.deadline-panel-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); }
+.client-add-group { display: inline-flex; align-items: center; gap: 3px; flex: none; }
+.client-add-group.is-positioned { position: fixed; z-index: 30; }
+.client-add-grip {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 44px;
+  border-radius: 999px;
+  background: #352447;
+  color: #e5c8ff;
+  cursor: grab;
+  touch-action: none;
+}
+.client-add-grip:active { cursor: grabbing; }
+@media (max-width: 650px) {
+  .client-board-shell { grid-template-columns: 60px minmax(0, 1fr); }
+  .client-board-main { padding-left: 0; }
+  .client-board-sidebar { margin-left: 0; }
+  .client-board-heading { flex-wrap: wrap; }
+  .client-tool-rail a { width: 40px; height: 40px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .client-tool-rail, .client-board-heading > div, .client-board-column, .client-board-sidebar {
+    animation: dashboard-enter 520ms cubic-bezier(.2, .7, .25, 1) backwards;
+  }
+  .client-board-column:nth-child(1) { animation-delay: 90ms; }
+  .client-board-column:nth-child(2) { animation-delay: 150ms; }
+  .client-board-column:nth-child(3) { animation-delay: 210ms; }
+  .client-board-column:nth-child(4) { animation-delay: 270ms; }
+  .client-board-sidebar { animation-delay: 330ms; }
+  @keyframes dashboard-enter {
+    from { opacity: 0; translate: 0 20px; }
+    to { opacity: 1; translate: 0 0; }
+  }
+}

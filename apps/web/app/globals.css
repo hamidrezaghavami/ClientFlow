@@ -369,3 +369,28 @@
 }
 .account-summary h1 { font-size: clamp(24px, 5vw, 36px); }
 .mobile-nav a.button { justify-content: flex-start; }
+
+.back-to-top {
+  position: fixed;
+  z-index: 10;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid #c5a4ff;
+  border-radius: 50%;
+  background: #2c1d3b;
+  color: #f1e6ff;
+  box-shadow: 0 6px 24px #08040e80;
+}
+
+.back-to-top:hover, .back-to-top:focus-visible {
+  background: #c5a4ff;
+  color: #181122;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .back-to-top { animation: landing-rise 220ms ease-out; }
+}

@@ -544,14 +544,14 @@
     overflow: hidden;
   }
 
-  .client-board-column[data-stacked="true"] .client-board-card:is(:hover, :focus-within) {
+  .client-board-column[data-stacked="true"] .client-board-card:is(:hover, :focus-within, :has(select:open)) {
     z-index: 1;
     border-color: var(--stage-accent);
     box-shadow: 0 9px 19px #08070c65;
     translate: 0 -3px;
   }
 
-  .client-board-column[data-stacked="true"] .client-board-card:is(:hover, :focus-within) .client-card-details {
+  .client-board-column[data-stacked="true"] .client-board-card:is(:hover, :focus-within, :has(select:open)) .client-card-details {
     grid-template-rows: 1fr;
     visibility: visible;
   }

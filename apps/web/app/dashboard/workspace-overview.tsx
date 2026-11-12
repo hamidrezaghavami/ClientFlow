@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowDownRight, ArrowUpRight, Check, CheckCircle2, Clock3, FolderOpen } from 'lucide-react';
+import { ArrowRight, Check, ChevronRight } from 'lucide-react';
 
 const projects = [
-  { id: 'northstar', name: 'Website refresh', client: 'Northstar Studio', deadline: 'Nov 16', initial: 'N' },
-  { id: 'forma', name: 'Brand launch', client: 'Forma Coffee', deadline: 'Nov 20', initial: 'F' },
-  { id: 'atlas', name: 'Pitch deck', client: 'Atlas Ventures', deadline: 'Nov 18', initial: 'A' },
+  { id: 'northstar', name: 'Website refresh', client: 'Northstar Studio', deadline: 'Nov 16', initial: 'N', contact: 'Maya Chen', deliverable: 'A responsive marketing site with a clearer portfolio and inquiry flow.' },
+  { id: 'forma', name: 'Brand launch', client: 'Forma Coffee', deadline: 'Nov 20', initial: 'F', contact: 'Leo Martin', deliverable: 'A brand kit with packaging direction for the first coffee release.' },
+  { id: 'atlas', name: 'Pitch deck', client: 'Atlas Ventures', deadline: 'Nov 18', initial: 'A', contact: 'Sofia Reed', deliverable: 'An investor deck with a clear narrative and updated financial highlights.' },
 ] as const;
 
 const tasks = [
@@ -23,15 +23,12 @@ type ProjectId = (typeof projects)[number]['id'];
 
 export function WorkspaceOverview() {
   const [completed, setCompleted] = useState(() => new Set(tasks.filter(task => task.done).map(task => task.id)));
-  const [projectFilter, setProjectFilter] = useState<ProjectId | null>(null);
-  const visibleTasks = projectFilter ? tasks.filter(task => task.project === projectFilter) : tasks;
-  const selectedProject = projects.find(project => project.id === projectFilter);
+  const [selectedId, setSelectedId] = useState<ProjectId>('northstar');
+  const project = projects.find(item => item.id === selectedId) ?? projects[0];
+  const projectTasks = tasks.filter(task => task.project === project.id);
+  const projectDone = projectTasks.filter(task => completed.has(task.id)).length;
+  const nextTask = projectTasks.find(task => !completed.has(task.id));
   const overdue = tasks.filter(task => task.due === 'Overdue' && !completed.has(task.id)).length;
-  const summary = [
-    { label: 'Active projects', value: projects.length, icon: FolderOpen },
-    { label: 'Tasks completed', value: `${completed.size} / ${tasks.length}`, icon: CheckCircle2 },
-    { label: 'Overdue tasks', value: overdue, icon: Clock3 },
-  ];
 
   function toggleTask(id: number) {
     setCompleted(previous => {
@@ -42,89 +39,81 @@ export function WorkspaceOverview() {
     });
   }
 
-  function filterTasks(id: ProjectId) {
-    setProjectFilter(id);
-    const heading = document.getElementById('workspace-tasks');
-    heading?.focus();
-  }
-
   return (
     <main id="workspace-main" className="workspace-width workspace-main">
       <div className="workspace-intro">
         <div>
-          <h1>Dashboard</h1>
-          <p>See what’s due and keep your projects moving.</p>
+          <h1>Client work</h1>
+          <p>{projects.length} active projects · {overdue === 1 ? '1 overdue action' : `${overdue} overdue actions`}</p>
         </div>
         <span className="workspace-demo">Sample workspace</span>
       </div>
 
-      <dl className="workspace-metrics" aria-label="Workspace summary" aria-live="polite">
-        {summary.map(({ label, value, icon: Icon }) => (
-          <div key={label} className="workspace-metric">
-            <dt><Icon size={17} aria-hidden="true" />{label}</dt>
-            <dd>{value}</dd>
-          </div>
-        ))}
-      </dl>
-
-      <div className="workspace-columns">
-        <section className="workspace-panel" aria-labelledby="workspace-tasks">
-          <div className="workspace-panel-title">
-            <div>
-              <h2 id="workspace-tasks" tabIndex={-1}>Tasks</h2>
-              <p>{selectedProject ? selectedProject.name : 'Check off tasks as you finish them.'}</p>
-            </div>
-            {projectFilter && <button className="workspace-clear" onClick={() => setProjectFilter(null)}>Show all</button>}
-          </div>
-          <ul className="workspace-task-list">
-            {visibleTasks.map(task => {
-              const done = completed.has(task.id);
+      <div className="client-work-grid">
+        <section className="client-roster" aria-labelledby="client-roster-title">
+          <h2 id="client-roster-title">Clients</h2>
+          <ul className="client-roster-list">
+            {projects.map(item => {
+              const needsAttention = tasks.some(task => task.project === item.id && task.due === 'Overdue' && !completed.has(task.id));
               return (
-                <li key={task.id} className="workspace-task">
-                  <label>
-                    <input type="checkbox" checked={done} onChange={() => toggleTask(task.id)} />
-                    <span className="workspace-checkbox" aria-hidden="true">{done && <Check size={14} />}</span>
-                    <span>
-                      <span className={done ? 'workspace-task-name is-done' : 'workspace-task-name'}>{task.name}</span>
-                      <small>{projects.find(project => project.id === task.project)?.name}</small>
+                <li key={item.id}>
+                  <button className="client-choice" aria-pressed={item.id === selectedId}
+                    aria-controls="client-project-brief" onClick={() => setSelectedId(item.id)}>
+                    <span className={`workspace-initial client-mark-${item.id}`} aria-hidden="true">{item.initial}</span>
+                    <span><strong>{item.client}</strong><small>{item.name}</small>
+                      {needsAttention && <small className="client-attention">Needs attention</small>}
                     </span>
-                  </label>
-                  <span className={task.due === 'Overdue' && !done ? 'workspace-due is-overdue' : 'workspace-due'}>
-                    {done ? 'Done' : task.due}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-
-        <section className="workspace-panel" aria-labelledby="workspace-projects">
-          <div className="workspace-panel-title">
-            <div><h2 id="workspace-projects">Active projects</h2><p>Select a project to see its tasks.</p></div>
-            <ArrowDownRight size={18} className="workspace-project-hint" aria-hidden="true" />
-          </div>
-          <ul className="workspace-project-list">
-            {projects.map(project => {
-              const projectTasks = tasks.filter(task => task.project === project.id);
-              const done = projectTasks.filter(task => completed.has(task.id)).length;
-              return (
-                <li key={project.id}>
-                  <button className="workspace-project" aria-pressed={projectFilter === project.id} onClick={() => filterTasks(project.id)}>
-                    <span className="workspace-project-heading">
-                      <span className="workspace-initial" aria-hidden="true">{project.initial}</span>
-                      <span><strong>{project.name}</strong><small>{project.client}</small></span>
-                      <ArrowUpRight size={16} className="workspace-project-arrow" aria-hidden="true" />
-                    </span>
-                    <progress max={projectTasks.length} value={done} aria-label={`${project.name} task progress`} />
-                    <span className="workspace-project-meta"><span>{done} of {projectTasks.length} tasks</span><span>Due {project.deadline}</span></span>
+                    <ChevronRight size={16} aria-hidden="true" />
                   </button>
                 </li>
               );
             })}
           </ul>
         </section>
+
+        <article className="client-brief" id="client-project-brief" aria-labelledby="client-project-title">
+          <div className="client-brief-heading">
+            <div className="client-context">
+              <span className={`workspace-initial client-mark-${project.id}`} aria-hidden="true">{project.initial}</span>
+              <span>{project.client}<small>{project.contact}</small></span>
+            </div>
+            <span className="client-deadline">Due {project.deadline}</span>
+          </div>
+          <h2 id="client-project-title">{project.name}</h2>
+          <p className="client-deliverable">{project.deliverable}</p>
+          <div className="client-progress">
+            <span>Project progress</span><span>{projectDone} of {projectTasks.length} complete</span>
+            <progress value={projectDone} max={projectTasks.length} aria-label="Project task progress" />
+          </div>
+          <div className="client-next" aria-live="polite">
+            <ArrowRight size={19} aria-hidden="true" />
+            <div>
+              <h3>Next action</h3>
+              <p>{nextTask?.name ?? 'All project tasks are complete.'}</p>
+            </div>
+            {nextTask && <span className={`workspace-due${nextTask.due === 'Overdue' ? ' is-overdue' : ''}`}>{nextTask.due}</span>}
+          </div>
+          <details className="client-checklist">
+            <summary>Project checklist</summary>
+            <ul className="workspace-task-list">
+              {projectTasks.map(task => {
+                const done = completed.has(task.id);
+                return (
+                  <li key={task.id} className="workspace-task">
+                    <label>
+                      <input type="checkbox" checked={done} onChange={() => toggleTask(task.id)} />
+                      <span className="workspace-checkbox" aria-hidden="true">{done && <Check size={14} />}</span>
+                      <span className={done ? 'workspace-task-name is-done' : 'workspace-task-name'}>{task.name}</span>
+                    </label>
+                    <span className={`workspace-due${task.due === 'Overdue' && !done ? ' is-overdue' : ''}`}>{done ? 'Done' : task.due}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
+        </article>
       </div>
-      <p className="workspace-note">Changes in this sample workspace reset when you reload the page.</p>
+      <p className="workspace-note">Sample changes reset when you reload.</p>
     </main>
   );
 }

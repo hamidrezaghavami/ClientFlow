@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { ArrowUpRight, CalendarDays, ChevronRight, LayoutGrid, Sparkles, X } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, ChevronRight, LayoutGrid, X } from 'lucide-react';
 import { MovableAddClient } from './movable-add-client';
 import { ClientAssistant } from './client-assistant';
 import { DeadlinePicker } from './deadline-picker';
@@ -86,7 +86,6 @@ export function WorkspaceOverview() {
         <h1>Client Board</h1>
         <a href="#client-board-title" aria-label="Client stages" title="Client stages"><LayoutGrid size={19} aria-hidden="true" /></a>
         <button type="button" aria-label="Due next" title="Due next" aria-haspopup="dialog" onClick={() => deadlines.current?.showModal()}><CalendarDays size={19} aria-hidden="true" /></button>
-        <a href="#client-assistant-title" aria-label="Client assistant" title="Client assistant"><Sparkles size={19} aria-hidden="true" /></a>
       </nav>
 
 

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Sparkles, X } from 'lucide-react';
 
 type ProjectContext = {
   project: string;
@@ -15,6 +15,19 @@ const suggestions = ['What should I prioritize?', 'Draft a client follow-up', 'H
 
 export function ClientAssistant({ projects }: { projects: ProjectContext[] }) {
   const { getToken } = useAuth();
+  const [open, setOpen] = useState(false);
+  const launcher = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (open) (panel.current?.querySelector('textarea') ?? panel.current?.querySelector<HTMLButtonElement>('.assistant-close'))?.focus();
+  }, [open]);
+
+  function close() {
+    setOpen(false);
+    launcher.current?.focus();
+  }
+
   const [question, setQuestion] = useState('');
   const [includeBoard, setIncludeBoard] = useState(false);
   const [answer, setAnswer] = useState('');
@@ -47,13 +60,29 @@ export function ClientAssistant({ projects }: { projects: ProjectContext[] }) {
   }
 
   return (
-    <section className="assistant-panel" aria-labelledby="client-assistant-title">
+    <div className="assistant-widget" onKeyDown={event => {
+      if (open && event.key === 'Escape') {
+        event.preventDefault();
+        close();
+      }
+    }}>
+      <button ref={launcher} type="button" className="assistant-launcher" aria-expanded={open}
+        aria-controls={open ? 'client-assistant-panel' : undefined}
+        aria-label={open ? 'Close client assistant' : 'Open client assistant'}
+        title={open ? 'Close client assistant' : 'Open client assistant'}
+        onClick={() => open ? close() : setOpen(true)}>
+        <Sparkles size={25} aria-hidden="true" />
+      </button>
+      {open && <section ref={panel} id="client-assistant-panel" className="assistant-panel" aria-labelledby="client-assistant-title">
       <div className="assistant-heading">
         <span className="assistant-icon"><Sparkles size={20} aria-hidden="true" /></span>
         <div>
           <h2 id="client-assistant-title" tabIndex={-1}>Client assistant</h2>
-          <p>Prioritize projects, draft follow-ups, and plan client handoffs with Gemini.</p>
+          <p>Plan client work with Gemini.</p>
         </div>
+        <button type="button" className="assistant-close" onClick={close} aria-label="Close assistant panel">
+          <X size={18} aria-hidden="true" />
+        </button>
       </div>
       {apiUrl ? (
         <form onSubmit={ask}>
@@ -76,6 +105,7 @@ export function ClientAssistant({ projects }: { projects: ProjectContext[] }) {
         {error && <p role="alert">{error}</p>}
         {answer && <p>{answer}</p>}
       </div>
-    </section>
+      </section>}
+    </div>
   );
 }

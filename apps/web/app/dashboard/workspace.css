@@ -461,3 +461,62 @@
   .assistant-panel { margin-left: 0; }
   .client-tool-rail button { width: 40px; height: 40px; }
 }
+
+.assistant-widget {
+  position: fixed;
+  z-index: 35;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+}
+.assistant-launcher {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid #e2c5ff;
+  border-radius: 50%;
+  background: #ca9ff9;
+  color: #261438;
+  box-shadow: 0 7px 24px #9e62db56;
+}
+.assistant-launcher:hover { background: #e2c5ff; }
+.assistant-widget .assistant-panel {
+  position: absolute;
+  right: 68px;
+  bottom: 0;
+  width: min(365px, calc(100vw - 104px));
+  max-height: min(540px, calc(100dvh - 46px));
+  overflow: auto;
+  margin: 0;
+  padding: 16px;
+  box-shadow: 0 16px 48px #08040ebb;
+}
+.assistant-close {
+  display: grid;
+  place-items: center;
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  color: #e6caff;
+}
+.assistant-close:hover { background: #352447; }
+@media (max-width: 540px) {
+  .assistant-widget .assistant-panel {
+    right: 0;
+    bottom: 68px;
+    width: min(365px, calc(100vw - 36px));
+    max-height: min(540px, calc(100dvh - 104px));
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .assistant-launcher[aria-expanded="false"]:not(:hover, :focus-visible) {
+    animation: assistant-float 4s ease-in-out infinite;
+  }
+  .assistant-widget .assistant-panel { animation: dashboard-enter 220ms ease-out backwards; }
+  @keyframes assistant-float {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -5px; }
+  }
+}

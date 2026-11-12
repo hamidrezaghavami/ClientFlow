@@ -6,7 +6,7 @@ A calmer home for freelance clients, projects, and tasks.
 
 An interactive landing-page design preview, built with Next.js, React, TypeScript and Tailwind. The 2D hero organizes client/project/task cards on scroll or with a button. Reduced-motion settings are respected. The demo board supports task status changes and reset, with fictional data held in memory.
 
-Clerk handles sign-in, account creation, and password recovery. The signed-in dashboard shows an interactive sample workspace with project progress, task completion, and overdue work. Sample changes reset on reload. Persistent workspace data will be served by the separate Express/PostgreSQL API.
+Clerk handles sign-in, account creation, and password recovery. The signed-in dashboard shows an interactive client board with sample engagements, editable project details, and stage controls. Sample changes reset on reload. Persistent workspace data will be served by the separate Express/PostgreSQL API.
 
 ## Run locally
 

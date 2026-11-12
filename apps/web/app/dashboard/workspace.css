@@ -515,3 +515,54 @@
 
 .client-tool-rail .client-tool-add { background: #ca9ff9; color: #261438; }
 .client-tool-rail .client-tool-add:is(:hover, :focus-visible) { background: #e2c5ff; }
+
+.client-board-columns { align-items: start; }
+.client-board-column { min-height: 0; }
+.client-board-column[data-empty="true"] { border-style: dashed; }
+.client-board-column[data-empty="true"] .client-board-empty { padding-block: 4px 8px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .client-board-column[data-stacked="true"] .client-board-card {
+    position: relative;
+    padding-bottom: 16px;
+    margin-bottom: 0;
+    box-shadow: 0 -2px 9px #08070c35;
+  }
+
+  .client-board-column[data-stacked="true"] .client-board-card + .client-board-card {
+    margin-top: -8px;
+  }
+
+  .client-board-column[data-stacked="true"] .client-card-details {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+  }
+
+  .client-board-column[data-stacked="true"] .client-card-details-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .client-board-column[data-stacked="true"] .client-board-card:is(:hover, :focus-within) {
+    z-index: 1;
+    border-color: var(--stage-accent);
+    box-shadow: 0 9px 19px #08070c65;
+    translate: 0 -3px;
+  }
+
+  .client-board-column[data-stacked="true"] .client-board-card:is(:hover, :focus-within) .client-card-details {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .client-board-column[data-stacked="true"] .client-board-card {
+    transition: translate 180ms ease-out, box-shadow 180ms ease-out, border-color 180ms ease-out;
+  }
+
+  .client-board-column[data-stacked="true"] .client-card-details {
+    transition: grid-template-rows 230ms cubic-bezier(.2, .75, .25, 1);
+  }
+}

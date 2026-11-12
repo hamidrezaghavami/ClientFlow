@@ -95,7 +95,7 @@ export function WorkspaceOverview() {
           {stages.map((stage, index) => {
             const items = clients.filter(item => item.stage === stage);
             return (
-              <section className="client-board-column" data-stage={index} key={stage} aria-labelledby={`client-stage-${index}`}>
+              <section className="client-board-column" data-stage={index} data-stacked={items.length > 1} data-empty={items.length === 0} key={stage} aria-labelledby={`client-stage-${index}`}>
                 <h2 id={`client-stage-${index}`}><i data-stage={index} aria-hidden="true" />{stage}<span>{items.length}</span></h2>
                 {items.length === 0 && <p className="client-board-empty">No clients here yet.</p>}
                 {items.map(item => (
@@ -106,22 +106,26 @@ export function WorkspaceOverview() {
                       <span><strong>{item.client}</strong><small>{item.project}</small></span>
                       <ArrowUpRight size={15} aria-hidden="true" />
                     </button>
-                    <div className="client-board-card-meta">
-                      {item.contact && <span>{item.contact}</span>}
-                      {item.deadline && <span><CalendarDays size={14} aria-hidden="true" /> Due {formatDeadline(item.deadline)}</span>}
+                    <div className="client-card-details">
+                      <div className="client-card-details-inner">
+                        <div className="client-board-card-meta">
+                          {item.contact && <span>{item.contact}</span>}
+                          {item.deadline && <span><CalendarDays size={14} aria-hidden="true" /> Due {formatDeadline(item.deadline)}</span>}
+                        </div>
+                        <label className="client-board-stage">
+                          <span>Stage</span>
+                          <select id={`client-stage-control-${item.id}`} value={item.stage} aria-label={`Stage for ${item.client}`} onChange={event => {
+                            const next = stages.find(value => value === event.target.value);
+                            if (next) {
+                              moveClient(item.id, next);
+                              requestAnimationFrame(() => document.getElementById(`client-stage-control-${item.id}`)?.focus());
+                            }
+                          }}>
+                            {stages.map(value => <option key={value}>{value}</option>)}
+                          </select>
+                        </label>
+                      </div>
                     </div>
-                    <label className="client-board-stage">
-                      <span>Stage</span>
-                      <select id={`client-stage-control-${item.id}`} value={item.stage} aria-label={`Stage for ${item.client}`} onChange={event => {
-                        const next = stages.find(value => value === event.target.value);
-                        if (next) {
-                          moveClient(item.id, next);
-                          requestAnimationFrame(() => document.getElementById(`client-stage-control-${item.id}`)?.focus());
-                        }
-                      }}>
-                        {stages.map(value => <option key={value}>{value}</option>)}
-                      </select>
-                    </label>
                   </article>
                 ))}
               </section>

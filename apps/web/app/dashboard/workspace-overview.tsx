@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { ArrowUpRight, CalendarDays, ChevronRight, LayoutGrid, X } from 'lucide-react';
-import { MovableAddClient } from './movable-add-client';
+import { ArrowUpRight, CalendarDays, ChevronRight, LayoutGrid, UserPlus, X } from 'lucide-react';
 import { ClientAssistant } from './client-assistant';
 import { DeadlinePicker } from './deadline-picker';
 
@@ -86,13 +85,12 @@ export function WorkspaceOverview() {
         <span className="client-tool-label">Client Board</span>
         <a href="#client-board-title" aria-label="Client stages" title="Client stages"><LayoutGrid size={19} aria-hidden="true" /></a>
         <button type="button" aria-label="Due next" title="Due next" aria-haspopup="dialog" onClick={() => deadlines.current?.showModal()}><CalendarDays size={19} aria-hidden="true" /></button>
+        <button type="button" className="client-tool-add" aria-label="Add client" title="Add client"
+          aria-haspopup="dialog" onClick={() => openEditor()}><UserPlus size={19} aria-hidden="true" /></button>
       </nav>
 
 
       <section id="client-board-title" tabIndex={-1} className="client-board-main" aria-labelledby="workspace-title">
-        <div className="client-board-heading">
-          <MovableAddClient onAdd={() => openEditor()} />
-        </div>
         <div className="client-board-columns">
           {stages.map((stage, index) => {
             const items = clients.filter(item => item.stage === stage);

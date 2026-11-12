@@ -16,8 +16,6 @@
 .client-board-sidebar { background: #1c1425; color: #f1eaf7; padding: 22px 14px; }
 .client-board-main { min-width: 0; padding: clamp(20px, 3vw, 40px); }
 .client-board-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-.client-board-heading h1 { font-size: clamp(26px, 3vw, 39px); font-weight: 650; letter-spacing: -.04em; line-height: 1.1; }
-.client-board-heading p { color: var(--board-muted); margin-top: 7px; font-size: 14px; }
 .client-board-primary { display: inline-flex; gap: 7px; align-items: center; justify-content: center; white-space: nowrap; min-height: 44px; border-radius: 999px; padding: 0 13px; background: var(--board-purple); color: #1b1026; font-size: 13px; font-weight: 600; }
 .client-board-primary:hover { background: #dfc1ff; }
 .client-board-columns { display: grid; grid-template-columns: repeat(4, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; padding: 4px 4px 10px; margin-inline: -4px; }
@@ -60,7 +58,6 @@
   .client-board-sidebar { display: none; }
   .client-board-columns { grid-template-columns: 1fr; overflow: visible; }
   .client-board-column { min-height: auto; }
-  .client-board-heading p { font-size: 13px; }
   .client-board-stage select { min-height: 44px; }
 }
 
@@ -342,7 +339,7 @@
   gap: 10px;
   padding: 24px 4px 14px;
 }
-.client-tool-rail h1 {
+.client-tool-label {
   font-size: 10px;
   text-align: center;
   font-weight: 600;
@@ -359,7 +356,6 @@
 }
 .client-tool-rail a:is(:hover, :focus-visible) { background: #49315d; }
 .client-board-main { grid-column: 2; grid-row: 1; padding-left: 10px; }
-.client-board-heading h2 { font-size: clamp(23px, 3vw, 36px); font-weight: 650; letter-spacing: -.04em; line-height: 1.1; }
 .client-board-sidebar {
   grid-column: 2;
   grid-row: 2;
@@ -390,7 +386,7 @@
   .client-tool-rail a { width: 40px; height: 40px; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .client-tool-rail, .client-board-heading > div, .client-board-column, .client-board-sidebar {
+  .client-tool-rail, .workspace-title, .client-board-column, .client-board-sidebar {
     animation: dashboard-enter 520ms cubic-bezier(.2, .7, .25, 1) backwards;
   }
   .client-board-column:nth-child(1) { animation-delay: 90ms; }
@@ -519,4 +515,17 @@
     0%, 100% { translate: 0 0; }
     50% { translate: 0 -5px; }
   }
+}
+
+.workspace-title {
+  font-size: clamp(14px, 2.3vw, 22px);
+  font-weight: 650;
+  line-height: 1.2;
+  text-align: center;
+}
+.client-board-heading { justify-content: flex-end; min-height: 44px; margin-bottom: 14px; }
+@media (max-width: 420px) {
+  .workspace-header-inner { gap: 8px; }
+  .workspace-header-inner .brand { font-size: 17px; gap: 4px; }
+  .workspace-header-inner .brand-mark { scale: .75; }
 }

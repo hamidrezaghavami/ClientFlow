@@ -19,6 +19,7 @@ export default async function DashboardPage() {
             <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
             clientflow
           </Link>
+          <h1 id="workspace-title" className="workspace-title">Client engagements</h1>
           <div className="workspace-account">
             <span>My workspace</span>
             <UserButton />

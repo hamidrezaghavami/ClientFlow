@@ -83,18 +83,14 @@ export function WorkspaceOverview() {
   return (
     <main id="workspace-main" className="client-board-shell">
       <nav className="client-tool-rail" aria-label="Client Board">
-        <h1>Client Board</h1>
+        <span className="client-tool-label">Client Board</span>
         <a href="#client-board-title" aria-label="Client stages" title="Client stages"><LayoutGrid size={19} aria-hidden="true" /></a>
         <button type="button" aria-label="Due next" title="Due next" aria-haspopup="dialog" onClick={() => deadlines.current?.showModal()}><CalendarDays size={19} aria-hidden="true" /></button>
       </nav>
 
 
-      <section className="client-board-main" aria-labelledby="client-board-title">
+      <section id="client-board-title" tabIndex={-1} className="client-board-main" aria-labelledby="workspace-title">
         <div className="client-board-heading">
-          <div>
-            <h2 id="client-board-title" tabIndex={-1}>Client engagements</h2>
-            <p>Manage each client engagement from first contact to delivery.</p>
-          </div>
           <MovableAddClient onAdd={() => openEditor()} />
         </div>
         <div className="client-board-columns">

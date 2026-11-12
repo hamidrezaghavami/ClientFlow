@@ -3,5 +3,7 @@ import { clerkConfigured } from '../../../../auth-config';
 import { AuthUnavailable } from '../../../../components/auth-unavailable';
 
 export default function SignUpPage() {
-  return clerkConfigured ? <SignUp /> : <AuthUnavailable />;
+  if (!clerkConfigured) return <AuthUnavailable />;
+
+  return <SignUp appearance={{ options: { unsafe_disableDevelopmentModeWarnings: true } }} />;
 }

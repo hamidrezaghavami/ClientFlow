@@ -395,25 +395,25 @@
   .back-to-top { animation: landing-rise 220ms ease-out; }
 }
 
-:is(.client-board-column, .deadline-panel-item, .preview-client-stage) {
+:is(.client-board-column, .deadline-panel-item) {
   --stage-accent: #a9c9fa;
   --stage-card: #262d38;
   --stage-edge: #4a607a;
   --stage-chip: #34455e;
 }
-:is(.client-board-column, .deadline-panel-item, .preview-client-stage)[data-stage="1"] {
+:is(.client-board-column, .deadline-panel-item)[data-stage="1"] {
   --stage-accent: #f3b69c;
   --stage-card: #342b2b;
   --stage-edge: #735548;
   --stage-chip: #553a33;
 }
-:is(.client-board-column, .deadline-panel-item, .preview-client-stage)[data-stage="2"] {
+:is(.client-board-column, .deadline-panel-item)[data-stage="2"] {
   --stage-accent: #efd093;
   --stage-card: #332e25;
   --stage-edge: #716143;
   --stage-chip: #51442e;
 }
-:is(.client-board-column, .deadline-panel-item, .preview-client-stage)[data-stage="3"] {
+:is(.client-board-column, .deadline-panel-item)[data-stage="3"] {
   --stage-accent: #9fd9c5;
   --stage-card: #253330;
   --stage-edge: #47685d;

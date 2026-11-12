@@ -1,4 +1,4 @@
-import { Archive, ArrowLeftRight, ArrowUpRight, CalendarDays, ChevronDown, Handshake, LayoutGrid, Search, Sparkles, UserPlus } from 'lucide-react';
+import { Archive, ArrowLeftRight, CalendarDays, Handshake, LayoutGrid, Search, Sparkles, UserPlus } from 'lucide-react';
 import { stages } from '../app/lib/client-board';
 import { formatDeadline, initialClients } from '../app/lib/sample-engagements';
 import './dashboard-preview.css';
@@ -15,8 +15,7 @@ export function DashboardPreview() {
       </div>
       <div className="dashboard-preview-body">
         <aside className="dashboard-preview-rail" aria-hidden="true">
-          <span>Client Board</span>
-          <LayoutGrid /><CalendarDays /><UserPlus className="dashboard-preview-add" /><Archive /><Handshake />
+          <LayoutGrid className="dashboard-preview-active" /><CalendarDays /><UserPlus className="dashboard-preview-add" /><Archive /><Handshake />
         </aside>
         <div className="dashboard-preview-main">
           <div className="dashboard-preview-search" aria-hidden="true"><Search /> Search clients or projects</div>
@@ -29,13 +28,11 @@ export function DashboardPreview() {
                   <div className="dashboard-preview-client">
                     <span className="dashboard-preview-avatar" aria-hidden="true">{client.client[0]}</span>
                     <div><strong>{client.client}</strong><small>{client.project}</small></div>
-                    <ArrowUpRight className="dashboard-preview-open" aria-hidden="true" />
                   </div>
                   {client.actionOwner === 'client' && <span className="dashboard-preview-pill">Waiting on client</span>}
                   <p><CalendarDays aria-hidden="true" /> Due {formatDeadline(client.deadline)}</p>
                   {client.nextAction && <p className="dashboard-preview-next"><strong>Next action</strong>{client.nextAction}</p>}
                   <span className="dashboard-preview-pill"><ArrowLeftRight aria-hidden="true" /> Scope changes</span>
-                  <div className="dashboard-preview-stage">Stage <span className="dashboard-preview-pill">{stage} <ChevronDown aria-hidden="true" /></span></div>
                 </article>)}
               </section>;
             })}

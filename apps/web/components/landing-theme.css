@@ -106,9 +106,6 @@
   .scope-hero h1 > * { animation: scope-headline-in 620ms cubic-bezier(.2,.7,.3,1) both; }
   .scope-hero h1 > :nth-child(2) { animation-delay: 70ms; }
   .scope-hero h1 > :nth-child(3) { animation-delay: 140ms; }
-  .scope-hero-tile { animation: scope-card-in 900ms cubic-bezier(.19,.8,.27,1) 130ms both; }
-  .scope-hero-swap, .scope-hero-calendar { animation-delay: 235ms; }
-  .scope-hero-addon, .scope-hero-approved { animation-delay: 360ms; }
   .scope-hero-tray { animation: scope-headline-in 600ms 410ms both; }
   @keyframes scope-headline-in { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0; } }
   @keyframes scope-card-in {
@@ -127,4 +124,63 @@
   .scope-hero-outcome { height: 100px; margin: 25px 10px 0; }
   .scope-hero-tile { font-size: clamp(8px, 1.8vw, 13px); }
   .scope-hero > p { margin-top: 16px; }
+}
+
+.scope-hero-sticker {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: clamp(29px, 4vw, 55px);
+  aspect-ratio: 1;
+  border: 2px solid #fffdf9;
+  border-radius: 29%;
+  box-shadow: 0 7px 14px #372b2040, inset 0 1px 1px #ffffff80;
+  transform: rotate(var(--turn));
+}
+.scope-hero-sticker svg { width: 53%; height: 53%; stroke-width: 2.2; }
+.scope-hero-pointer {
+  --turn: -13deg; --from-x: -22px; --from-y: 24px;
+  left: 23%; bottom: -16%; background: #302b26; color: #fff9ee;
+}
+.scope-hero-pointer svg { fill: #fff9ee; }
+.scope-hero-send {
+  --turn: 14deg; --from-x: -20px; --from-y: -25px;
+  left: 35%; top: -25%; background: #f8f2e6; color: #ae3b00;
+}
+.scope-hero-file {
+  --turn: -12deg; --from-x: 25px; --from-y: -28px;
+  right: 4%; top: -22%; background: #f8f2e6; color: #305b43;
+}
+.scope-hero-controls { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; }
+.scope-hero-controls .scope-hero-down { margin: 0; }
+.scope-hero-motion {
+  display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  border: 1px solid var(--line); border-radius: 50%; color: var(--landing-muted);
+}
+.scope-hero-motion:hover { background: #e7e3da; }
+@media (prefers-reduced-motion: no-preference) {
+  .scope-hero-tile, .scope-hero-sticker {
+    animation: scope-card-in 900ms cubic-bezier(.19,.8,.27,1) var(--entrance, 130ms) both,
+      scope-card-drift var(--drift-time, 5.8s) ease-in-out calc(var(--entrance, 130ms) + 900ms) infinite;
+  }
+  .scope-hero-brief { --drift-x: -4px; --drift-y: -8px; --drift-turn: -2deg; }
+  .scope-hero-swap { --entrance: 235ms; --drift-x: 1px; --drift-y: -5px; --drift-turn: 2deg; --drift-time: 6.4s; }
+  .scope-hero-addon { --entrance: 360ms; --drift-x: 5px; --drift-y: -7px; --drift-turn: 2deg; }
+  .scope-hero-calendar { --entrance: 235ms; --drift-x: -3px; --drift-y: -9px; --drift-turn: -2deg; --drift-time: 6.1s; }
+  .scope-hero-approved { --entrance: 360ms; --drift-x: 3px; --drift-y: -7px; --drift-turn: 2deg; --drift-time: 5.3s; }
+  .scope-hero-sticker { --entrance: 480ms; --drift-x: 2px; --drift-y: -6px; --drift-turn: -4deg; --drift-time: 4.9s; }
+  .scope-hero-stage[data-motion-paused="true"] :is(.scope-hero-tile, .scope-hero-sticker, .scope-hero-tray, h1 > *) {
+    animation-play-state: paused;
+  }
+  @keyframes scope-card-drift {
+    0%, 100% { translate: 0; rotate: 0deg; }
+    50% { translate: var(--drift-x) var(--drift-y); rotate: var(--drift-turn); }
+  }
+}
+@media (prefers-reduced-motion: reduce) { .scope-hero-motion { display: none; } }
+@media (max-width: 900px) {
+  .scope-hero-pointer { left: 16%; bottom: -7%; }
+  .scope-hero-send { top: -7%; left: 38%; }
+  .scope-hero-file { top: -7%; right: 7%; }
 }

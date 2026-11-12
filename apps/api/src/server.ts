@@ -6,7 +6,7 @@ import { z } from 'zod';
 const app = express();
 const allowedOrigins = (process.env.WEB_ORIGINS ?? 'http://127.0.0.1:3000')
   .split(',').map(origin => origin.trim()).filter(Boolean);
-const model = process.env.GEMINI_MODEL ?? 'gemini-2.5-flash';
+const model = process.env.GEMINI_MODEL ?? 'gemini-3.1-flash-lite';
 if (!/^gemini-[a-z0-9.-]+$/.test(model)) throw new Error('Invalid GEMINI_MODEL');
 
 const assistantInput = z.object({

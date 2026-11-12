@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { ArrowUpRight, Sparkles, X } from 'lucide-react';
+import { ArrowUp, Sparkles, X } from 'lucide-react';
 
 type ProjectContext = {
   project: string;
@@ -30,6 +30,7 @@ export function ClientAssistant({ projects, draft }: { projects: ProjectContext[
 
   const [question, setQuestion] = useState('');
   const [includeBoard, setIncludeBoard] = useState(false);
+  const [sent, setSent] = useState('');
   const [answer, setAnswer] = useState('');
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
@@ -42,6 +43,7 @@ export function ClientAssistant({ projects, draft }: { projects: ProjectContext[
     request.current = null;
     setQuestion(draft.question);
     setIncludeBoard(false);
+    setSent('');
     setAnswer('');
     setError('');
     setPending(false);
@@ -51,10 +53,13 @@ export function ClientAssistant({ projects, draft }: { projects: ProjectContext[
 
   async function ask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!apiUrl || !question.trim() || pending) return;
+    const message = question.trim();
+    if (!apiUrl || !message || request.current) return;
     const controller = new AbortController();
     request.current = controller;
     setPending(true);
+    setSent(message);
+    setQuestion('');
     setError('');
     setAnswer('');
     try {
@@ -64,13 +69,16 @@ export function ClientAssistant({ projects, draft }: { projects: ProjectContext[
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         signal: AbortSignal.any([controller.signal, AbortSignal.timeout(25_000)]),
-        body: JSON.stringify({ question, projects: includeBoard ? projects.slice(0, 20) : [] }),
+        body: JSON.stringify({ question: message, projects: includeBoard ? projects.slice(0, 20) : [] }),
       });
       const data = await response.json() as { answer?: string; error?: string };
       if (!response.ok || !data.answer) throw new Error(data.error ?? 'The assistant is unavailable.');
       if (!controller.signal.aborted) setAnswer(data.answer);
     } catch (problem) {
-      if (!controller.signal.aborted) setError(problem instanceof Error && problem.name === 'Error' ? problem.message : 'The assistant did not respond. Try again.');
+      if (!controller.signal.aborted) {
+        setError(problem instanceof Error && problem.name === 'Error' ? problem.message : 'Gemini did not respond. Try again.');
+        setQuestion(message);
+      }
     } finally {
       if (request.current === controller) {
         request.current = null;
@@ -98,33 +106,43 @@ export function ClientAssistant({ projects, draft }: { projects: ProjectContext[
         <span className="assistant-icon"><Sparkles size={20} aria-hidden="true" /></span>
         <div>
           <h2 id="client-assistant-title" tabIndex={-1}>Client assistant</h2>
-          <p>Plan client work with Gemini.</p>
         </div>
         <button type="button" className="assistant-close" onClick={close} aria-label="Close assistant panel">
           <X size={18} aria-hidden="true" />
         </button>
       </div>
-      {apiUrl ? (
-        <form onSubmit={ask}>
-          <label className="sr-only" htmlFor="assistant-question">Ask about your client work</label>
-          <textarea id="assistant-question" value={question} onChange={event => setQuestion(event.target.value)}
-            placeholder="What would you like help with?" maxLength={1200} required />
-          <div className="assistant-suggestions">
-            {suggestions.map(prompt => <button type="button" key={prompt} onClick={() => setQuestion(prompt)}>{prompt}</button>)}
+      {apiUrl ? <>
+        <div className="assistant-conversation" aria-live="polite">
+          {sent && <div className="assistant-message assistant-message-user"><span>You</span><p>{sent}</p></div>}
+          {(pending || answer) && <div className="assistant-message assistant-message-reply">
+            <span><Sparkles size={13} aria-hidden="true" /> Gemini</span>
+            <p>{pending ? 'Thinking…' : answer}</p>
+          </div>}
+          {error && <p className="assistant-error" role="alert">{error}</p>}
+        </div>
+        {!sent && !question && <div className="assistant-suggestions">
+          {suggestions.map(prompt => <button type="button" key={prompt} onClick={() => {
+            setQuestion(prompt);
+            panel.current?.querySelector('textarea')?.focus();
+          }}>{prompt}</button>)}
+        </div>}
+        <form className="assistant-form" onSubmit={ask}>
+          <div className="assistant-composer">
+            <label className="sr-only" htmlFor="assistant-question">Message Gemini</label>
+            <textarea id="assistant-question" value={question} onChange={event => setQuestion(event.target.value)}
+              placeholder="Message Gemini…" rows={2} maxLength={1200} required readOnly={pending} />
+            <button type="submit" className="client-board-primary assistant-send" disabled={pending || !question.trim()}
+              aria-label="Send message" title="Send message"><ArrowUp size={18} aria-hidden="true" /></button>
           </div>
           <div className="assistant-actions">
-            <label><input type="checkbox" checked={includeBoard} onChange={event => setIncludeBoard(event.target.checked)} /> Include up to 20 open projects</label>
-            <button type="submit" className="client-board-primary" disabled={pending || !question.trim()}>
-              {pending ? 'Asking Gemini…' : 'Ask Gemini'}<ArrowUpRight size={16} aria-hidden="true" />
-            </button>
+            <label><input type="checkbox" checked={includeBoard} disabled={pending} onChange={event => setIncludeBoard(event.target.checked)} /> Include open projects</label>
+            <details className="assistant-disclosure">
+              <summary>What’s shared?</summary>
+              <p>Your message goes to Google Gemini. If selected, up to 20 open project titles, stages, and deadlines go with it. Avoid confidential details.</p>
+            </details>
           </div>
-          <p className="assistant-disclosure">Your question goes to Google Gemini. If selected, project titles, stages, and deadlines go with it. Avoid entering confidential information.</p>
         </form>
-      ) : <p className="assistant-disclosure">Gemini is awaiting setup.</p>}
-      <div className="assistant-result" aria-live="polite" aria-busy={pending}>
-        {error && <p role="alert">{error}</p>}
-        {answer && <p>{answer}</p>}
-      </div>
+      </> : <p className="assistant-disclosure">Gemini is awaiting setup.</p>}
       </section>}
     </div>
   );

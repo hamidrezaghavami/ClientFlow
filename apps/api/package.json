@@ -1,0 +1,21 @@
+{
+  "name": "@clientflow/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@clerk/express": "^2.1.88",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.4",
+    "zod": "^4.6.7"
+  }
+}

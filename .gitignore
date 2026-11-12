@@ -12,3 +12,5 @@ outputs/
 .vercel/
 coverage/
 npm-debug.log*
+
+apps/api/dist/

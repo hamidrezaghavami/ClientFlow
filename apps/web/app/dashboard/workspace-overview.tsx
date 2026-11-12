@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { ArrowUpRight, CalendarDays, ChevronRight, LayoutGrid, X } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, ChevronRight, LayoutGrid, Sparkles, X } from 'lucide-react';
 import { MovableAddClient } from './movable-add-client';
+import { ClientAssistant } from './client-assistant';
 import { DeadlinePicker } from './deadline-picker';
 
 const stages = ['New', 'In progress', 'In review', 'Delivered'] as const;
@@ -38,6 +39,7 @@ export function WorkspaceOverview() {
   }, []);
 
   const dialog = useRef<HTMLDialogElement>(null);
+  const deadlines = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const editor = dialog.current;
@@ -83,7 +85,8 @@ export function WorkspaceOverview() {
       <nav className="client-tool-rail" aria-label="Client Board">
         <h1>Client Board</h1>
         <a href="#client-board-title" aria-label="Client stages" title="Client stages"><LayoutGrid size={19} aria-hidden="true" /></a>
-        <a href="#deadline-panel-title" aria-label="Due next" title="Due next"><CalendarDays size={19} aria-hidden="true" /></a>
+        <button type="button" aria-label="Due next" title="Due next" aria-haspopup="dialog" onClick={() => deadlines.current?.showModal()}><CalendarDays size={19} aria-hidden="true" /></button>
+        <a href="#client-assistant-title" aria-label="Client assistant" title="Client assistant"><Sparkles size={19} aria-hidden="true" /></a>
       </nav>
 
 
@@ -136,13 +139,18 @@ export function WorkspaceOverview() {
         <p className="sr-only" role="status">{announcement}</p>
       </section>
 
-      <aside className="client-board-sidebar" aria-labelledby="deadline-panel-title">
+      <ClientAssistant projects={clients.filter(item => item.stage !== 'Delivered').map(item => ({
+        project: item.project, stage: item.stage, deadline: item.deadline || null,
+      }))} />
+
+      <dialog ref={deadlines} className="client-editor deadline-dialog" aria-labelledby="deadline-panel-title">
         <div className="deadline-panel-heading">
           <span className="deadline-panel-icon"><CalendarDays size={18} aria-hidden="true" /></span>
           <div>
             <h2 id="deadline-panel-title" tabIndex={-1}>Due next</h2>
             <p>{overdueCount ? `${overdueCount} overdue` : 'Client deadlines'}</p>
           </div>
+          <button className="client-editor-close" type="button" aria-label="Close deadlines" onClick={() => deadlines.current?.close()}><X size={19} /></button>
         </div>
         {dueClients.length ? (
           <ol className="deadline-panel-list">
@@ -150,7 +158,7 @@ export function WorkspaceOverview() {
               const overdue = today && item.deadline < today;
               return (
                 <li key={item.id}>
-                  <button type="button" className="deadline-panel-item" data-stage={stages.indexOf(item.stage)} onClick={() => openEditor(item)}
+                  <button type="button" className="deadline-panel-item" data-stage={stages.indexOf(item.stage)} onClick={() => { deadlines.current?.close(); openEditor(item); }}
                     aria-label={`Edit ${item.project} for ${item.client}, due ${formatDeadline(item.deadline)}${overdue ? ', overdue' : ''}`}>
                     <span>
                       <span className={overdue ? 'deadline-panel-date is-overdue' : 'deadline-panel-date'}>
@@ -166,7 +174,7 @@ export function WorkspaceOverview() {
             })}
           </ol>
         ) : <p className="deadline-panel-empty">No open client deadlines.</p>}
-      </aside>
+      </dialog>
 
       <dialog ref={dialog} className="client-editor" aria-labelledby="client-editor-title" onClose={() => setDraft(null)}>
         {draft && (

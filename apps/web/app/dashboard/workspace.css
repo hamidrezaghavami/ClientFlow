@@ -403,3 +403,61 @@
     to { opacity: 1; translate: 0 0; }
   }
 }
+
+.client-tool-rail button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 15px;
+  background: #2a2035;
+  color: #e4d0f7;
+}
+.client-tool-rail button:is(:hover, :focus-visible) { background: #49315d; }
+.deadline-dialog .client-editor-close { margin-left: auto; }
+.deadline-dialog .deadline-panel-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  padding: 10px;
+  border: 1px solid var(--stage-edge);
+  border-radius: 20px;
+  background: var(--stage-card);
+}
+.deadline-dialog .deadline-panel-item:hover { background: var(--stage-chip); }
+.assistant-panel {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  margin: 0 clamp(20px, 3vw, 40px) 28px 10px;
+  padding: clamp(16px, 3vw, 24px);
+  border: 1px solid var(--board-border);
+  border-radius: 22px;
+  background: radial-gradient(ellipse at top right, #2e2040, transparent 65%), #1c1525;
+}
+.assistant-heading, .assistant-actions, .assistant-suggestions { display: flex; align-items: center; gap: 10px; }
+.assistant-heading { margin-bottom: 14px; }
+.assistant-heading h2 { font-size: 17px; font-weight: 650; }
+.assistant-heading p, .assistant-disclosure { color: var(--board-muted); font-size: 12px; }
+.assistant-icon { display: grid; place-items: center; width: 42px; height: 42px; flex: none; border-radius: 50%; background: #37274a; color: #e6caff; }
+.assistant-panel textarea {
+  width: 100%; min-height: 78px; resize: vertical; padding: 12px; border: 1px solid #5d476c;
+  border-radius: 13px; background: #17101f; color: var(--board-ink); font: inherit;
+}
+.assistant-panel textarea::placeholder { color: var(--board-muted); }
+.assistant-suggestions, .assistant-actions { margin-top: 10px; flex-wrap: wrap; }
+.assistant-suggestions button { min-height: 36px; padding: 5px 10px; border: 1px solid #5d476c; border-radius: 999px; font-size: 12px; }
+.assistant-suggestions button:hover { background: #352447; }
+.assistant-actions { justify-content: space-between; }
+.assistant-actions label { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+.assistant-actions input { accent-color: var(--board-purple); }
+.assistant-actions button:disabled { opacity: .55; }
+.assistant-disclosure { margin-top: 10px; }
+.assistant-result p { margin-top: 12px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
+.assistant-result p[role="alert"] { color: #ffbcaa; }
+@media (max-width: 650px) {
+  .assistant-panel { margin-left: 0; }
+  .client-tool-rail button { width: 40px; height: 40px; }
+}

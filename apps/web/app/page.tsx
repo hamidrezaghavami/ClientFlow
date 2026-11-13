@@ -18,10 +18,12 @@ const restoreHeroOnReload = `
 })();
 `;
 
-export default function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ lang?: string | string[] }> }) {
+  const { lang } = await searchParams;
+  const language = lang === 'tr' || lang === 'fa' ? lang : 'en';
   return <>
     {/* Run before the landing markup so the browser cannot jump to an old section on reload. */}
     <script dangerouslySetInnerHTML={{ __html: restoreHeroOnReload }} />
-    <Landing />
+    <Landing language={language} />
   </>;
 }

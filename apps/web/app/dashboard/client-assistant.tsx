@@ -1,5 +1,7 @@
 'use client';
 
+import { translate, type Language } from '../../components/landing-language';
+
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { ArrowUp, Sparkles, X } from 'lucide-react';
@@ -11,9 +13,10 @@ type ProjectContext = {
 };
 
 const apiUrl = process.env.NEXT_PUBLIC_CLIENTFLOW_API_URL?.replace(/\/$/, '');
-const suggestions = ['What should I prioritize?', 'Draft a client follow-up', 'Help me plan a handoff'];
+const suggestions = ["What should I prioritize?", "Draft a client follow-up", "Help me plan a handoff"];
 
-export function ClientAssistant({ projects, draft }: { projects: ProjectContext[]; draft?: { question: string } }) {
+export function ClientAssistant({ language = 'en', projects, draft }: { language?: Language; projects: ProjectContext[]; draft?: { question: string } }) {
+  const t = translate(language);
   const { getToken } = useAuth();
   const [open, setOpen] = useState(false);
   const launcher = useRef<HTMLButtonElement>(null);
@@ -96,8 +99,8 @@ export function ClientAssistant({ projects, draft }: { projects: ProjectContext[
     }}>
       <button ref={launcher} type="button" className="assistant-launcher" aria-expanded={open}
         aria-controls={open ? 'client-assistant-panel' : undefined}
-        aria-label={open ? 'Close client assistant' : 'Open client assistant'}
-        title={open ? 'Close client assistant' : 'Open client assistant'}
+        aria-label={open ? t("Close client assistant") : t("Open client assistant")}
+        title={open ? t("Close client assistant") : t("Open client assistant")}
         onClick={() => open ? close() : setOpen(true)}>
         <Sparkles size={25} aria-hidden="true" />
       </button>
@@ -105,44 +108,44 @@ export function ClientAssistant({ projects, draft }: { projects: ProjectContext[
       <div className="assistant-heading">
         <span className="assistant-icon"><Sparkles size={20} aria-hidden="true" /></span>
         <div>
-          <h2 id="client-assistant-title" tabIndex={-1}>Client assistant</h2>
+          <h2 id="client-assistant-title" tabIndex={-1}>{t("Client assistant")}</h2>
         </div>
-        <button type="button" className="assistant-close" onClick={close} aria-label="Close assistant panel">
+        <button type="button" className="assistant-close" onClick={close} aria-label={t("Close assistant panel")} >
           <X size={18} aria-hidden="true" />
         </button>
       </div>
       {apiUrl ? <>
         <div className="assistant-conversation" aria-live="polite">
-          {sent && <div className="assistant-message assistant-message-user"><span>You</span><p>{sent}</p></div>}
+          {sent && <div className="assistant-message assistant-message-user"><span>{t("You")}</span><p>{sent}</p></div>}
           {(pending || answer) && <div className="assistant-message assistant-message-reply">
             <span><Sparkles size={13} aria-hidden="true" /> Gemini</span>
-            <p>{pending ? 'Thinking…' : answer}</p>
+            <p>{pending ? t("Thinking…") : answer}</p>
           </div>}
           {error && <p className="assistant-error" role="alert">{error}</p>}
         </div>
         {!sent && !question && <div className="assistant-suggestions">
           {suggestions.map(prompt => <button type="button" key={prompt} onClick={() => {
-            setQuestion(prompt);
+            setQuestion(t(prompt));
             panel.current?.querySelector('textarea')?.focus();
-          }}>{prompt}</button>)}
+          }}>{t(prompt)}</button>)}
         </div>}
         <form className="assistant-form" onSubmit={ask}>
           <div className="assistant-composer">
-            <label className="sr-only" htmlFor="assistant-question">Message Gemini</label>
+            <label className="sr-only" htmlFor="assistant-question">{t("Message Gemini")}</label>
             <textarea id="assistant-question" value={question} onChange={event => setQuestion(event.target.value)}
-              placeholder="Message Gemini…" rows={2} maxLength={1200} required readOnly={pending} />
+              placeholder={t("Message Gemini…")}  rows={2} maxLength={1200} required readOnly={pending} />
             <button type="submit" className="client-board-primary assistant-send" disabled={pending || !question.trim()}
-              aria-label="Send message" title="Send message"><ArrowUp size={18} aria-hidden="true" /></button>
+              aria-label={t("Send message")}  title={t("Send message")} ><ArrowUp size={18} aria-hidden="true" /></button>
           </div>
           <div className="assistant-actions">
-            <label><input type="checkbox" checked={includeBoard} disabled={pending} onChange={event => setIncludeBoard(event.target.checked)} /> Include open projects</label>
+            <label><input type="checkbox" checked={includeBoard} disabled={pending} onChange={event => setIncludeBoard(event.target.checked)} /> {t("Include open projects")} </label>
             <details className="assistant-disclosure">
-              <summary>What’s shared?</summary>
-              <p>Your message goes to Google Gemini. If selected, up to 20 open project titles, stages, and deadlines go with it. Avoid confidential details.</p>
+              <summary>{t("What’s shared?")}</summary>
+              <p>{t("Your message goes to Google Gemini. If selected, up to 20 open project titles, stages, and deadlines go with it. Avoid confidential details.")}</p>
             </details>
           </div>
         </form>
-      </> : <p className="assistant-disclosure">Gemini is awaiting setup.</p>}
+      </> : <p className="assistant-disclosure">{t("Gemini is awaiting setup.")}</p>}
       </section>}
     </div>
   );

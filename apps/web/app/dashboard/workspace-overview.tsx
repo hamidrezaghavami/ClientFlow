@@ -1,6 +1,6 @@
 'use client';
 
-import { translate, type Language } from '../../components/landing-language';
+import { landingDate, translate, type Language } from '../../components/landing-language';
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
 import { Archive, ArrowLeftRight, ArrowUpRight, CalendarDays, ChevronRight, Handshake, LayoutGrid, ListTodo, RotateCcw, Search, Sparkles, UserPlus, X } from 'lucide-react';
 import { ClientAssistant } from './client-assistant';
@@ -10,12 +10,13 @@ import { useAuth } from '@clerk/nextjs';
 import { postApi } from '../lib/api';
 import { boardSchema, stages, type Board, type Engagement } from '../lib/client-board';
 
-import { formatDeadline, initialClients } from '../lib/sample-engagements';
+import { initialClients } from '../lib/sample-engagements';
 
 type Stage = Engagement["stage"];
 
 export function WorkspaceOverview({ storageKey, language }: { storageKey: string; language: Language }) {
   const t = translate(language);
+  const formatDeadline = (date: string) => landingDate(date, language);
   const { getToken } = useAuth();
   const [clients, setClients] = useState(initialClients);
   const [ready, setReady] = useState(false);
@@ -42,9 +43,9 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
     .sort((a, b) => (a.followUp ?? '').localeCompare(b.followUp ?? ''));
   const dueIds = new Set(followUps.map(item => item.id));
   const actionGroups = [
-    { title: 'Follow up', items: followUps, empty: 'No client follow-ups due.' },
-    { title: 'Your move', items: openClients.filter(item => item.actionOwner !== 'client' && item.nextAction), empty: 'No next actions assigned to you.' },
-    { title: 'Client’s move', items: openClients.filter(item => item.actionOwner === 'client' && !dueIds.has(item.id)), empty: 'No other engagements waiting on a client.' },
+    { title: t("Follow up"), items: followUps, empty: t("No client follow-ups due.") },
+    { title: t("Your move"), items: openClients.filter(item => item.actionOwner !== 'client' && item.nextAction), empty: t("No next actions assigned to you.") },
+    { title: t("Client’s move"), items: openClients.filter(item => item.actionOwner === 'client' && !dueIds.has(item.id)), empty: t("No other engagements waiting on a client.") },
   ];
 
   const overdueCount = today ? dueClients.filter(item => item.deadline < today).length : 0;
@@ -102,7 +103,7 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
       await refreshBoard(signal);
       if (!wasReady && !signal.aborted) setSaveError('');
     } catch {
-      if (!signal.aborted && !boardRef.current) setSaveError('Could not load your board. Retrying shortly.');
+      if (!signal.aborted && !boardRef.current) setSaveError(t("Could not load your board. Retrying shortly."));
     }
   });
 
@@ -169,7 +170,7 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
     if (!client || !project) {
       const field = event.currentTarget.elements.namedItem(client ? 'project' : 'client');
       if (field instanceof HTMLInputElement) {
-        field.setCustomValidity('Enter a name.');
+        field.setCustomValidity(t("Enter a name."));
         field.reportValidity();
       }
       return;
@@ -178,7 +179,7 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
     const actionOwner = data.get('actionOwner') === 'client' ? 'client' : 'me';
     const current = boardRef.current?.clients.find(item => item.id === draft.id) ?? draft;
     if (draft.id && JSON.stringify(current) !== JSON.stringify(editorOriginal.current)) {
-      setSaveError('This engagement changed on another device. Reopen it to edit the latest version.');
+      setSaveError(t("This engagement changed on another device. Reopen it to edit the latest version."));
       return;
     }
     const updated: Engagement = {
@@ -200,15 +201,15 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
 
   return (
     <main id="workspace-main" className="client-board-shell">
-      <nav className="client-tool-rail" aria-label="Client Board">
-        <a href="#client-board-title" aria-label="Client stages" title="Client stages"><LayoutGrid size={19} aria-hidden="true" /></a>
-        <button type="button" disabled={!ready} aria-label="Due next" title="Due next" aria-haspopup="dialog" onClick={() => deadlines.current?.showModal()}><CalendarDays size={19} aria-hidden="true" /></button>
-        <button type="button" disabled={!ready} className="client-tool-add" aria-label="Add client" title="Add client"
+      <nav className="client-tool-rail" aria-label={t("Client Board")} >
+        <a href="#client-board-title" aria-label={t("Client stages")}  title={t("Client stages")} ><LayoutGrid size={19} aria-hidden="true" /></a>
+        <button type="button" disabled={!ready} aria-label={t("Due next")}  title={t("Due next")}  aria-haspopup="dialog" onClick={() => deadlines.current?.showModal()}><CalendarDays size={19} aria-hidden="true" /></button>
+        <button type="button" disabled={!ready} className="client-tool-add" aria-label={t("Add client")}  title={t("Add client")}
           aria-haspopup="dialog" onClick={() => openEditor()}><UserPlus size={19} aria-hidden="true" /></button>
-        <button type="button" disabled={!ready} aria-label="Archived engagements" title="Archived engagements" aria-haspopup="dialog"
+        <button type="button" disabled={!ready} aria-label={t("Archived engagements")}  title={t("Archived engagements")}  aria-haspopup="dialog"
           onClick={() => archive.current?.showModal()}><Archive size={19} aria-hidden="true" /></button>
         <button type="button" disabled={!ready} className="client-action-launcher" aria-label={`Who owes what?${followUps.length ? ` ${followUps.length} follow-ups due` : ''}`}
-          title="Who owes what?" aria-haspopup="dialog" onClick={() => actionPanel.current?.showModal()}>
+          title={t("Who owes what?")}  aria-haspopup="dialog" onClick={() => actionPanel.current?.showModal()}>
           <Handshake size={19} aria-hidden="true" />
           {followUps.length > 0 && <span aria-hidden="true" className="client-action-count">{followUps.length}</span>}
         </button>
@@ -219,7 +220,7 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
         <div className="client-board-toolbar">
           <label className="client-board-search">
             <Search size={16} aria-hidden="true" />
-            <input type="search" aria-label="Search client engagements" placeholder={t("Search clients or projects")}
+            <input type="search" aria-label={t("Search client engagements")}  placeholder={t("Search clients or projects")}
               value={query} onChange={event => setQuery(event.target.value)} />
           </label>
         </div>
@@ -229,7 +230,7 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
             return (
               <section className="client-board-column" data-stage={index} data-stacked={items.length > 1} data-empty={items.length === 0} key={stage} aria-labelledby={`client-stage-${index}`}>
                 <h2 id={`client-stage-${index}`}><i data-stage={index} aria-hidden="true" />{t(stage)}<span>{items.length}</span></h2>
-                {items.length === 0 && <p className="client-board-empty">{search ? 'No matches.' : 'No clients here yet.'}</p>}
+                {items.length === 0 && <p className="client-board-empty">{search ? t("No matches.") : t("No clients here yet.")}</p>}
                 {items.map(item => (
                   <article className="client-board-card" key={item.id}>
                     <button type="button" className="client-board-card-title" onClick={() => openEditor(item)}
@@ -239,24 +240,24 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
                       <ArrowUpRight size={15} aria-hidden="true" />
                     </button>
                     {item.stage !== 'Delivered' && item.actionOwner === 'client' && <span className="client-waiting-chip">
-                      {dueIds.has(item.id) ? 'Follow-up due' : 'Waiting on client'}
+                      {dueIds.has(item.id) ? t("Follow-up due") : t("Waiting on client")}
                     </span>}
                     <div className="client-card-details">
                       <div className="client-card-details-inner">
                         <div className="client-board-card-meta">
                           {item.contact && <span>{item.contact}</span>}
-                          {item.deadline && <span><CalendarDays size={14} aria-hidden="true" /> Due {formatDeadline(item.deadline)}</span>}
+                          {item.deadline && <span><CalendarDays size={14} aria-hidden="true" /> {t("Due")} {formatDeadline(item.deadline)}</span>}
                         </div>
                         {item.nextAction && <p className="client-card-next"><ListTodo size={14} aria-hidden="true" />
                           <span><strong>{t("Next action")}</strong>{item.nextAction}</span></p>}
                         <button type="button" className="client-scope-trigger" onClick={() => setScopeId(item.id)}
                           aria-label={`Scope changes for ${item.client}`} aria-haspopup="dialog">
                           <ArrowLeftRight size={14} aria-hidden="true" />
-                          {item.scope?.pending ? 'Scope decision pending' : 'Scope changes'}
+                          {item.scope?.pending ? t("Scope decision pending") : t('Scope changes')}
                         </button>
                         <label className="client-board-stage">
                           <span>{t("Stage")}</span>
-                          <select id={`client-stage-control-${item.id}`} value={item.stage} disabled={isSaving} aria-label={`Stage for ${item.client}`} onChange={async event => {
+                          <select id={`client-stage-control-${item.id}`} value={item.stage} disabled={isSaving} aria-label={t("Stage for {client}").replace("{client}", item.client)} onChange={async event => {
                             const next = stages.find(value => value === event.target.value);
                             if (next) {
                               await moveClient(item.id, next);
@@ -275,12 +276,12 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
           })}
         </div>}
         <p className="client-board-note" role={saveError ? 'alert' : undefined}>
-          {saveError || (ready ? 'Changes sync across your signed-in devices.' : 'Loading your board…')}
+          {saveError || (ready ? t("Changes sync across your signed-in devices.") : t("Loading your board…"))}
         </p>
         <p className="sr-only" role="status">{announcement}</p>
       </section>
 
-      <ClientAssistant draft={assistantDraft} projects={(ready ? activeClients : []).filter(item => item.stage !== 'Delivered').map(item => ({
+      <ClientAssistant language={language} draft={assistantDraft} projects={(ready ? activeClients : []).filter(item => item.stage !== 'Delivered').map(item => ({
         project: item.project, stage: item.stage, deadline: item.deadline || null,
       }))} />
 
@@ -288,10 +289,10 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
         <div className="deadline-panel-heading">
           <span className="deadline-panel-icon"><CalendarDays size={18} aria-hidden="true" /></span>
           <div>
-            <h2 id="deadline-panel-title" tabIndex={-1}>Due next</h2>
-            <p>{overdueCount ? `${overdueCount} overdue` : 'Client deadlines'}</p>
+            <h2 id="deadline-panel-title" tabIndex={-1}>{t("Due next")}</h2>
+            <p>{overdueCount ? `${overdueCount} · ${t("Overdue")}` : t("Client deadlines")}</p>
           </div>
-          <button className="client-editor-close" type="button" aria-label="Close deadlines" onClick={() => deadlines.current?.close()}><X size={19} /></button>
+          <button className="client-editor-close" type="button" aria-label={t("Close deadlines")}  onClick={() => deadlines.current?.close()}><X size={19} /></button>
         </div>
         {dueClients.length ? (
           <ol className="deadline-panel-list">
@@ -303,7 +304,7 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
                     aria-label={`Edit ${item.project} for ${item.client}, due ${formatDeadline(item.deadline)}${overdue ? ', overdue' : ''}`}>
                     <span>
                       <span className={overdue ? 'deadline-panel-date is-overdue' : 'deadline-panel-date'}>
-                        <time dateTime={item.deadline}>{formatDeadline(item.deadline)}</time>{overdue && ' · Overdue'}
+                        <time dateTime={item.deadline}>{formatDeadline(item.deadline)}</time>{overdue && ` · ${t("Overdue")}`}
                       </span>
                       <strong>{item.project}</strong>
                       <small>{item.client}</small>
@@ -314,13 +315,13 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
               );
             })}
           </ol>
-        ) : <p className="deadline-panel-empty">No open client deadlines.</p>}
+        ) : <p className="deadline-panel-empty">{t("No open client deadlines.")}</p>}
       </dialog>
 
       <dialog ref={actionPanel} className="client-editor deadline-dialog client-action-dialog" aria-labelledby="client-action-title">
         <div className="client-editor-heading">
-          <h2 id="client-action-title">Who owes what?</h2>
-          <button className="client-editor-close" type="button" aria-label="Close who owes what" onClick={() => actionPanel.current?.close()}><X size={19} /></button>
+          <h2 id="client-action-title">{t("Who owes what?")}</h2>
+          <button className="client-editor-close" type="button" aria-label={t("Close who owes what")}  onClick={() => actionPanel.current?.close()}><X size={19} /></button>
         </div>
         {actionGroups.map(group => <section key={group.title} className="client-action-group">
           <h3>{group.title} <span>{group.items.length}</span></h3>
@@ -331,13 +332,13 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
                 <small>{item.project}</small>
                 {item.nextAction && <span>{item.nextAction}</span>}
                 {item.actionOwner === 'client' && item.followUp && <time dateTime={item.followUp}>
-                  {item.followUp === today ? 'Follow up today' : item.followUp < today ? `Overdue · ${formatDeadline(item.followUp)}` : `Follow up ${formatDeadline(item.followUp)}`}
+                  {item.followUp === today ? t("Follow up today") : item.followUp < today ? `${t("Overdue")} · ${formatDeadline(item.followUp)}` : `${t("Follow up")} ${formatDeadline(item.followUp)}`}
                 </time>}
               </button>
               {dueIds.has(item.id) && <button type="button" className="client-action-draft" onClick={() => {
                 actionPanel.current?.close();
                 setAssistantDraft({ question: `Draft a short, friendly follow-up for ${item.client} about ${item.project}.${item.nextAction ? ` The next step is: ${item.nextAction}.` : ''} Use only these details.` });
-              }}><Sparkles size={14} aria-hidden="true" /> Draft nudge</button>}
+              }}><Sparkles size={14} aria-hidden="true" /> {t("Draft nudge")} </button>}
             </li>)}
           </ul> : <p className="deadline-panel-empty">{group.empty}</p>}
         </section>)}
@@ -345,22 +346,22 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
 
       <dialog ref={archive} className="client-editor deadline-dialog" aria-labelledby="archive-title">
         <div className="client-editor-heading">
-          <h2 id="archive-title">Archived engagements</h2>
-          <button className="client-editor-close" type="button" aria-label="Close archive" onClick={() => archive.current?.close()}><X size={19} /></button>
+          <h2 id="archive-title">{t("Archived engagements")}</h2>
+          <button className="client-editor-close" type="button" aria-label={t("Close archive")}  onClick={() => archive.current?.close()}><X size={19} /></button>
         </div>
         {archivedClients.length ? <ul className="client-archive-list">
           {archivedClients.map(item => <li key={item.id} className="deadline-panel-item client-archive-item" data-stage={stages.indexOf(item.stage)}>
-            <span><strong>{item.client}</strong><small>{item.project} · {item.stage}</small></span>
+            <span><strong>{item.client}</strong><small>{item.project} · {t(item.stage)}</small></span>
             <button type="button" disabled={isSaving} onClick={async () => {
               if (await persistClient({ ...item, archived: false })) setAnnouncement(`${item.client} restored to ${item.stage}.`);
-            }} aria-label={`Restore ${item.client}`}><RotateCcw size={14} aria-hidden="true" /> Restore</button>
+            }} aria-label={`Restore ${item.client}`}><RotateCcw size={14} aria-hidden="true" /> {t("Restore")} </button>
           </li>)}
-        </ul> : <p className="deadline-panel-empty">No archived engagements.</p>}
+        </ul> : <p className="deadline-panel-empty">{t("No archived engagements.")}</p>}
         {saveError && <p role="alert">{saveError}</p>}
       </dialog>
 
       <dialog ref={scopeDialog} className="client-editor scope-dialog" aria-labelledby="scope-title" onClose={() => setScopeId(null)}>
-        {scopeClient && <ScopeChangePanel key={scopeClient.id} project={scopeClient.project} deadline={scopeClient.deadline} scope={scopeClient.scope}
+        {scopeClient && <ScopeChangePanel language={language} key={scopeClient.id} project={scopeClient.project} deadline={scopeClient.deadline} scope={scopeClient.scope}
           onSave={(scope, deadline) => persistClient({ ...scopeClient, scope, deadline: deadline ?? scopeClient.deadline })}
           onRefresh={refreshBoard}
           onClose={() => scopeDialog.current?.close()} />}
@@ -371,29 +372,29 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
         {draft && (
           <form onSubmit={saveClient}>
             <div className="client-editor-heading">
-              <h2 id="client-editor-title">{draft.id ? 'Edit client engagement' : 'Add a client'}</h2>
-              <button type="button" className="client-editor-close" aria-label="Close editor" onClick={() => dialog.current?.close()}><X size={20} /></button>
+              <h2 id="client-editor-title">{draft.id ? t("Edit client engagement") : t("Add a client")}</h2>
+              <button type="button" className="client-editor-close" aria-label={t("Close editor")}  onClick={() => dialog.current?.close()}><X size={20} /></button>
             </div>
-            <label>Client name<input name="client" autoFocus required maxLength={80} defaultValue={draft.client}
+            <label>{t("Client name")}<input name="client" autoFocus required maxLength={80} defaultValue={draft.client}
               onInput={event => event.currentTarget.setCustomValidity('')} /></label>
-            <label>Project<input name="project" required maxLength={100} defaultValue={draft.project}
+            <label>{t("Project")}<input name="project" required maxLength={100} defaultValue={draft.project}
               onInput={event => event.currentTarget.setCustomValidity('')} /></label>
-            <label>Contact name<input name="contact" maxLength={80} defaultValue={draft.contact} /></label>
-            <label>{t("Next action")}<input name="nextAction" maxLength={140} placeholder="e.g. Send the first draft"
+            <label>{t("Contact name")}<input name="contact" maxLength={80} defaultValue={draft.contact} /></label>
+            <label>{t("Next action")}<input name="nextAction" maxLength={140} placeholder={t("e.g. Send the first draft")}
               defaultValue={draft.nextAction} /></label>
-            <label>Who’s up next?
+            <label>{t("Who’s up next?")}
               <select name="actionOwner" value={draft.actionOwner ?? 'me'} onChange={event => {
                 const actionOwner = event.target.value === 'client' ? 'client' : 'me';
                 setDraft(current => current && { ...current, actionOwner });
               }}>
-                <option value="me">Your move</option>
-                <option value="client">Client’s move</option>
+                <option value="me">{t("Your move")}</option>
+                <option value="client">{t("Client’s move")}</option>
               </select>
             </label>
-            {draft.actionOwner === 'client' && <DeadlinePicker name="followUp" label="Follow-up date" initialValue={draft.followUp ?? ''} />}
+            {draft.actionOwner === 'client' && <DeadlinePicker language={language} name="followUp" label={t("Follow-up date")}  initialValue={draft.followUp ?? ''} />}
             {draft.scope?.pending?.token
-              ? <p className="client-board-note">The deadline is locked while the client review is open.</p>
-              : <DeadlinePicker initialValue={draft.deadline} />}
+              ? <p className="client-board-note">{t("The deadline is locked while the client review is open.")}</p>
+              : <DeadlinePicker language={language} initialValue={draft.deadline} />}
             <label>{t("Stage")}<select name="stage" defaultValue={draft.stage}>{stages.map(stage => <option key={stage} value={stage}>{t(stage)}</option>)}</select></label>
             {saveError && <p role="alert">{saveError}</p>}
             <div className="client-editor-actions">
@@ -401,9 +402,9 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
                 if (!await persistClient({ ...(clients.find(item => item.id === draft.id) ?? draft), archived: true })) return;
                 setAnnouncement(`${draft.client} archived.`);
                 dialog.current?.close();
-              }}><Archive size={15} aria-hidden="true" /> Archive</button>}
-              <button type="button" onClick={() => dialog.current?.close()}>Cancel</button>
-              <button type="submit" className="client-board-primary" disabled={isSaving}>{isSaving ? 'Saving…' : 'Save client'}</button>
+              }}><Archive size={15} aria-hidden="true" /> {t("Archive")} </button>}
+              <button type="button" onClick={() => dialog.current?.close()}>{t("Cancel")}</button>
+              <button type="submit" className="client-board-primary" disabled={isSaving}>{isSaving ? t("Saving…") : t("Save client")}</button>
             </div>
           </form>
         )}

@@ -1,3 +1,6 @@
+import { enUS, trTR, faIR } from '@clerk/localizations';
+import { headers } from 'next/headers';
+import { languageHref, readLanguage } from '../components/landing-language';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { clerkConfigured } from '../auth-config';
@@ -9,17 +12,20 @@ export const metadata: Metadata = {
   description: 'Manage freelance client projects, track deadlines, and get scope changes approved with a single link.',
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const language = readLanguage((await headers()).get('x-clientflow-language'));
+  const locale = { en: enUS, tr: trTR, fa: faIR }[language];
+  const title = { en: 'Sign in to ClientFlow', tr: 'ClientFlow’a giriş yap', fa: 'ورود به کلاینت‌فلو' }[language];
   return (
-    <html lang="en">
+    <html lang={language}>
       <body>
         {clerkConfigured ? <ClerkProvider
           signInUrl="/sign-in"
           signUpUrl="/sign-up"
           signInFallbackRedirectUrl="/dashboard"
           signUpFallbackRedirectUrl="/dashboard"
-          afterSignOutUrl="/"
-          localization={{ signIn: { start: { title: 'Sign in to ClientFlow' } } }}
+          afterSignOutUrl={languageHref("/", language)}
+          localization={{ ...locale, signIn: { ...locale.signIn, start: { ...locale.signIn?.start, title } } }}
           appearance={{
             elements: { headerTitle: 'clientflow-account-title', footerActionLink: 'clientflow-auth-link', formFieldAction: 'clientflow-auth-link' },
             variables: {

@@ -1,5 +1,7 @@
 'use client';
 
+import { translate, type Language } from '../../components/landing-language';
+
 import { useAuth } from '@clerk/nextjs';
 import { postApi } from '../lib/api';
 import { useState, type FormEvent } from 'react';
@@ -8,7 +10,7 @@ import { dateLabel, dollars, ReviewOptions, type ReviewChoice, type ReviewTerms 
 import { DeadlinePicker } from './deadline-picker';
 import { applyScopeDecision, type ScopeChange } from '../lib/client-board';
 
-export function ScopeChangePanel({ project, deadline, scope, onSave, onRefresh, onClose }: {
+export function ScopeChangePanel({ language = 'en', project, deadline, scope, onSave, onRefresh, onClose }: { language?: Language;
   project: string;
   deadline: string;
   scope?: ScopeChange;
@@ -16,6 +18,7 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onRefresh, 
   onRefresh: () => Promise<void>;
   onClose: () => void;
 }) {
+  const t = translate(language);
   const { getToken } = useAuth();
 
   async function scopeReviewRequest(body: object) {
@@ -52,7 +55,7 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onRefresh, 
         await navigator.clipboard.writeText(`${window.location.origin}/review#${token}`);
         setCopied(true);
       } catch {
-        setError('Copy the link from the field above.');
+        setError(t("Copy the link from the field above."));
       }
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : 'Could not publish the review.');
@@ -87,15 +90,15 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onRefresh, 
     const extraCents = Math.round(Number(data.get('extra')) * 100);
     const newDeadline = String(data.get('newDeadline'));
     if (!requested || !originalScope.includes(replaced)) {
-      setError('Enter the new deliverable and a replacement that matches a line in the current scope.');
+      setError(t("Enter the new deliverable and a replacement that matches a line in the current scope."));
       return;
     }
     if (originalScope.some(item => item.toLowerCase() === requested.toLowerCase())) {
-      setError('The requested deliverable is already in the current scope.');
+      setError(t("The requested deliverable is already in the current scope."));
       return;
     }
     if (!newDeadline || (deadline && newDeadline < deadline)) {
-      setError('Choose a date for the add-on on or after the current deadline.');
+      setError(t("Choose a date for the add-on on or after the current deadline."));
       return;
     }
     setBusy(true);
@@ -120,57 +123,57 @@ export function ScopeChangePanel({ project, deadline, scope, onSave, onRefresh, 
   return (
     <>
       <div className="client-editor-heading">
-        <div><h2 id="scope-title">Scope changes</h2><p>{project}</p></div>
-        <button type="button" className="client-editor-close" aria-label="Close scope changes" onClick={onClose}><X size={19} aria-hidden="true" /></button>
+        <div><h2 id="scope-title">{t("Scope changes")}</h2><p>{project}</p></div>
+        <button type="button" className="client-editor-close" aria-label={t("Close scope changes")}  onClick={onClose}><X size={19} aria-hidden="true" /></button>
       </div>
       {pending ? (
         <div className="scope-proposal">
-          <p className="scope-request"><span>Client request</span><strong>{pending.requested}</strong></p>
-          <ReviewOptions terms={pending} selected={selected} onSelect={setSelected} disabled={Boolean(pending.token)} />
-          {link && <label className="scope-share-link">Client review link
+          <p className="scope-request"><span>{t("Client request")}</span><strong>{pending.requested}</strong></p>
+          <ReviewOptions language={language} terms={pending} selected={selected} onSelect={setSelected} disabled={Boolean(pending.token)} />
+          {link && <label className="scope-share-link">{t("Client review link")}
             <input readOnly value={link} onFocus={event => event.currentTarget.select()} />
           </label>}
-          {copied && <p role="status">Review link copied.</p>}
+          {copied && <p role="status">{t("Review link copied.")}</p>}
           {error && <p role="alert">{error}</p>}
-          {deadline !== pending.originalDeadline && <p role="status">The deadline changed after this proposal was drafted. Discard it and create a new proposal with the updated date.</p>}
+          {deadline !== pending.originalDeadline && <p role="status">{t("The deadline changed after this proposal was drafted. Discard it and create a new proposal with the updated date.")}</p>}
           <div className="client-editor-actions scope-actions">
-            {pending.token ? <button type="button" disabled={busy} onClick={revoke}>Revoke link</button> : <>
+            {pending.token ? <button type="button" disabled={busy} onClick={revoke}>{t("Revoke link")}</button> : <>
               <button type="button" disabled={busy} onClick={async () => {
                 if (await onSave({ deliverables: pending.originalScope, history })) setSelected(null);
-              }}>Discard proposal</button>
-              <button type="button" disabled={busy || !selected || deadline !== pending.originalDeadline} onClick={recordDecision}>Record approval</button>
+              }}>{t("Discard proposal")}</button>
+              <button type="button" disabled={busy || !selected || deadline !== pending.originalDeadline} onClick={recordDecision}>{t("Record approval")}</button>
             </>}
             <button type="button" className="client-board-primary" disabled={busy || deadline !== pending.originalDeadline} onClick={publish}>
-              {busy ? 'Working…' : pending.published ? 'Copy review link' : 'Create and copy link'}
+              {busy ? t("Working…") : pending.published ? t("Copy review link") : t("Create and copy link")}
             </button>
           </div>
         </div>
       ) : (
         <form className="scope-proposal" onSubmit={saveProposal}>
-          <label>Requested deliverable<input name="requested" placeholder="e.g. Pricing page" required maxLength={120} /></label>
-          <label>Current scope <span>One deliverable per line</span>
+          <label>{t("Requested deliverable")}<input name="requested" placeholder={t("e.g. Pricing page")}  required maxLength={120} /></label>
+          <label>{t("Current scope")} <span>{t("One deliverable per line")}</span>
             <textarea name="deliverables" rows={3} required maxLength={1500} defaultValue={scope?.deliverables.join('\n')} placeholder={'Homepage\nAbout page'} />
           </label>
-          <label>Deliverable to replace<input name="replaced" placeholder="e.g. About page" required maxLength={120} /></label>
+          <label>{t("Deliverable to replace")}<input name="replaced" placeholder={t("e.g. About page")}  required maxLength={120} /></label>
           <div className="scope-form-grid">
-            <label>Add-on price (USD)<input name="extra" type="number" required min="0" max="999999" step="0.01" placeholder="350" /></label>
-            <DeadlinePicker name="newDeadline" label="Add-on deadline" initialValue={deadline} />
+            <label>{t("Add-on price (USD)")}<input name="extra" type="number" required min="0" max="999999" step="0.01" placeholder="350" /></label>
+            <DeadlinePicker language={language} name="newDeadline" label={t("Add-on deadline")}  initialValue={deadline} />
           </div>
           {error && <p role="alert">{error}</p>}
-          <div className="client-editor-actions"><button type="submit" className="client-board-primary" disabled={busy}>Compare options</button></div>
+          <div className="client-editor-actions"><button type="submit" className="client-board-primary" disabled={busy}>{t("Compare options")}</button></div>
         </form>
       )}
-      {history.length > 0 && <section className="scope-history" aria-label="Approval history">
-        <h3>Approval history</h3>
-        <p className="scope-history-total">Approved add-ons {dollars.format(approvedExtras / 100)}</p>
+      {history.length > 0 && <section className="scope-history" aria-label={t("Approval history")} >
+        <h3>{t("Approval history")}</h3>
+        <p className="scope-history-total">{t("Approved add-ons")} {dollars.format(approvedExtras / 100)}</p>
         <ol>{history.map(decision => <li key={decision.recordedAt}>
-          <strong>{decision.requested} · {decision.choice === 'swap' ? 'Swapped in' : 'Added to scope'}</strong>
+          <strong>{decision.requested} · {decision.choice === 'swap' ? t("Swapped in") : t("Added to scope")}</strong>
           <span>{decision.choice === 'swap'
             ? `Replaced ${decision.replaced} · No extra charge`
             : `Kept ${decision.replaced} · +${dollars.format(decision.extraCents / 100)}`}</span>
-          <span>Delivery {dateLabel(decision.originalDeadline)}{decision.choice === 'add' && decision.newDeadline !== decision.originalDeadline
+          <span>{t("Delivery")} {dateLabel(decision.originalDeadline)}{decision.choice === 'add' && decision.newDeadline !== decision.originalDeadline
             ? ` → ${dateLabel(decision.newDeadline)}` : ''} · Recorded {dateLabel(decision.recordedAt.slice(0, 10))}</span>
-          <details><summary>Original scope</summary><ul>{decision.originalScope.map(item => <li key={item}>{item}</li>)}</ul></details>
+          <details><summary>{t("Original scope")}</summary><ul>{decision.originalScope.map(item => <li key={item}>{item}</li>)}</ul></details>
         </li>)}</ol>
       </section>}
     </>

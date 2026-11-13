@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { SignIn } from '@clerk/nextjs';
 import Link from 'next/link';
 import { clerkConfigured } from '../../../../auth-config';
@@ -10,7 +11,7 @@ export default async function SignInPage({ params, searchParams }: {
   searchParams: Promise<Record<string, string | string[]>>;
 }) {
   const [segments, query] = await Promise.all([params, searchParams]);
-  const language = readLanguage(query.lang);
+  const language = readLanguage(query.lang ?? (await headers()).get('x-clientflow-language'));
   const t = translate(language);
   const path = ['sign-in', ...(segments['sign-in'] ?? []).map(encodeURIComponent)].join('/');
 

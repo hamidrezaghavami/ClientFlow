@@ -1,3 +1,5 @@
+import { readLanguage } from '../components/landing-language';
+import { headers } from 'next/headers';
 import Landing from '../components/landing';
 
 const restoreHeroOnReload = `
@@ -20,7 +22,7 @@ const restoreHeroOnReload = `
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ lang?: string | string[] }> }) {
   const { lang } = await searchParams;
-  const language = lang === 'tr' || lang === 'fa' ? lang : 'en';
+  const language = readLanguage(lang ?? (await headers()).get('x-clientflow-language'));
   return <>
     {/* Run before the landing markup so the browser cannot jump to an old section on reload. */}
     <script dangerouslySetInnerHTML={{ __html: restoreHeroOnReload }} />

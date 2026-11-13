@@ -1,23 +1,28 @@
 'use client';
 
+import { translate, type Language } from '../../components/landing-language';
+
 import { useId, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
-
-const monthLabel = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' });
-const dayLabel = new Intl.DateTimeFormat('en', { dateStyle: 'long' });
-const shortDate = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' });
-const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function dateValue(date: Date) {
   return [date.getFullYear(), date.getMonth() + 1, date.getDate()].map((part, index) =>
     String(part).padStart(index ? 2 : 4, '0')).join('-');
 }
 
-export function DeadlinePicker({ initialValue, name = 'deadline', label = 'Deadline' }: {
+export function DeadlinePicker({ language = 'en', initialValue, name = 'deadline', label = 'Deadline' }: { language?: Language;
   initialValue: string;
   name?: string;
   label?: string;
 }) {
+  const t = translate(language);
+  const locale = language === 'fa' ? 'fa-IR-u-ca-gregory' : language;
+  const monthLabel = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' });
+  const dayLabel = new Intl.DateTimeFormat(locale, { dateStyle: 'long' });
+  const shortDate = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' });
+  const weekdayLabel = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' });
+  const weekdays = Array.from({ length: 7 }, (_, index) => weekdayLabel.format(new Date(Date.UTC(2024, 0, index + 1))));
+
   const calendarId = useId();
   const [value, setValue] = useState(initialValue);
   const [open, setOpen] = useState(false);
@@ -54,19 +59,19 @@ export function DeadlinePicker({ initialValue, name = 'deadline', label = 'Deadl
       }
     }}>
       <input type="hidden" name={name} value={value} />
-      <span className="deadline-label" id={`${calendarId}-label`}>{label}</span>
+      <span className="deadline-label" id={`${calendarId}-label`}>{t(label)}</span>
       <button type="button" id={`${calendarId}-trigger`} className="deadline-trigger"
         aria-labelledby={`${calendarId}-label ${calendarId}-value`} aria-expanded={open}
         aria-controls={open ? calendarId : undefined} onClick={toggle}>
-        <span id={`${calendarId}-value`}>{selected ? shortDate.format(selected) : 'Choose a date'}</span>
+        <span id={`${calendarId}-value`}>{selected ? shortDate.format(selected) : t("Choose a date")}</span>
         <CalendarDays size={17} aria-hidden="true" />
       </button>
       {open && month && (
         <div className="deadline-calendar" id={calendarId} role="group" aria-label={`Choose ${label.toLowerCase()}`}>
           <div className="deadline-calendar-header">
-            <button type="button" aria-label="Previous month" onClick={() => setMonth(new Date(year, monthIndex - 1, 1))}><ChevronLeft size={18} /></button>
+            <button type="button" aria-label={t("Previous month")}  onClick={() => setMonth(new Date(year, monthIndex - 1, 1))}><ChevronLeft size={18} /></button>
             <strong aria-live="polite">{monthLabel.format(month)}</strong>
-            <button type="button" aria-label="Next month" onClick={() => setMonth(new Date(year, monthIndex + 1, 1))}><ChevronRight size={18} /></button>
+            <button type="button" aria-label={t("Next month")}  onClick={() => setMonth(new Date(year, monthIndex + 1, 1))}><ChevronRight size={18} /></button>
           </div>
           <div className="deadline-calendar-days">
             {weekdays.map(day => <span key={day} aria-hidden="true">{day}</span>)}
@@ -79,8 +84,8 @@ export function DeadlinePicker({ initialValue, name = 'deadline', label = 'Deadl
             })}
           </div>
           <div className="deadline-calendar-footer">
-            <button type="button" onClick={() => choose('')}>Clear</button>
-            <button type="button" onClick={() => choose(dateValue(today))}>Today</button>
+            <button type="button" onClick={() => choose('')}>{t("Clear")}</button>
+            <button type="button" onClick={() => choose(dateValue(today))}>{t("Today")}</button>
           </div>
         </div>
       )}

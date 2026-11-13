@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { UserButton } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
 import Link from 'next/link';
@@ -12,7 +13,7 @@ export default async function DashboardPage({ searchParams }: {
   searchParams: Promise<Record<string, string | string[]>>;
 }) {
   const query = await searchParams;
-  const language = readLanguage(query.lang);
+  const language = readLanguage(query.lang ?? (await headers()).get('x-clientflow-language'));
   const t = translate(language);
   if (!clerkConfigured) redirect('/sign-in');
   const { userId } = await auth.protect();

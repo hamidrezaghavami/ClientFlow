@@ -1,5 +1,7 @@
 'use client';
 
+import { translate, type Language } from '../../components/landing-language';
+
 import { ArrowLeftRight, Plus } from 'lucide-react';
 
 export type ReviewChoice = 'swap' | 'add';
@@ -17,26 +19,27 @@ export function dateLabel(value: string) {
   return value ? formatDate.format(new Date(`${value}T00:00:00Z`)) : 'No deadline';
 }
 
-export function ReviewOptions({ terms, selected, onSelect, disabled }: {
+export function ReviewOptions({ language = 'en', terms, selected, onSelect, disabled }: { language?: Language;
   terms: ReviewTerms;
   selected: ReviewChoice | null;
   onSelect: (choice: ReviewChoice) => void;
   disabled?: boolean;
 }) {
+  const t = translate(language);
   return <fieldset className="scope-options" disabled={disabled}>
-    <legend>Review the two options</legend>
+    <legend>{t("Review the two options")}</legend>
     <label>
       <input type="radio" name="scope-choice" checked={selected === 'swap'} onChange={() => onSelect('swap')} />
       <ArrowLeftRight size={18} aria-hidden="true" />
-      <strong>Swap it in</strong>
-      <span>Replaces {terms.replaced}</span>
-      <span>No extra charge · {dateLabel(terms.originalDeadline)}</span>
+      <strong>{t("Swap it in")}</strong>
+      <span>{t("Replaces")} {terms.replaced}</span>
+      <span>No extra charge · {(terms.originalDeadline ? dateLabel(terms.originalDeadline) : t("No deadline"))}</span>
     </label>
     <label>
       <input type="radio" name="scope-choice" checked={selected === 'add'} onChange={() => onSelect('add')} />
       <Plus size={18} aria-hidden="true" />
-      <strong>Add to scope</strong>
-      <span>Keeps {terms.replaced}</span>
+      <strong>{t("Add to scope")}</strong>
+      <span>{t("Keeps")} {terms.replaced}</span>
       <span>+{dollars.format(terms.extraCents / 100)} · {dateLabel(terms.newDeadline)}</span>
     </label>
   </fieldset>;

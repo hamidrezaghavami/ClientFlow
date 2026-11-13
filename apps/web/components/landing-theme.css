@@ -208,14 +208,56 @@
 .landing-shell[dir="rtl"] .site-footer p { margin-left: 0; margin-inline-start: auto; }
 .landing-shell[dir="rtl"] .preview-client-stage h4 > span { margin-left: 0; margin-inline-start: auto; }
 .landing-shell[dir="rtl"] .text-link svg { scale: -1 1; }
-@media (max-width: 900px) {
-  .landing-shell[lang="fa"] .scope-hero-stack { height: 150px; }
+.landing-shell[lang="fa"] .scope-hero-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr) minmax(0, .8fr);
+  grid-template-areas: "request headline outcome";
+  align-items: center;
+  gap: clamp(16px, 2.5vw, 36px);
 }
+.landing-shell[lang="fa"] .scope-hero h1 { grid-area: headline; font-size: clamp(32px, 4.8vw, 74px); }
+.landing-shell[lang="fa"] .scope-hero h1 > :nth-child(2) { padding-inline: 0; }
+.landing-shell[lang="fa"] :is(.scope-hero-stack, .scope-hero-outcome) {
+  position: relative;
+  inset: auto;
+  width: auto;
+  height: auto;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.landing-shell[lang="fa"] .scope-hero-stack {
+  grid-area: request;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.landing-shell[lang="fa"] .scope-hero-outcome { grid-area: outcome; }
+.landing-shell[lang="fa"] :is(.scope-hero-tile, .scope-hero-tray) {
+  position: relative;
+  inset: auto;
+  width: auto;
+  min-height: 0;
+  font-size: clamp(11px, 1vw, 14px);
+}
+.landing-shell[lang="fa"] :is(.scope-hero-brief, .scope-hero-tray) { grid-column: 1 / -1; }
+.landing-shell[lang="fa"] .scope-hero-tile { --turn: 0deg; }
+.landing-shell[lang="fa"] .scope-hero-sticker { width: 28px; }
+.landing-shell[lang="fa"] .scope-hero-send { top: -12px; left: -8px; }
+.landing-shell[lang="fa"] .scope-hero-pointer { bottom: -11px; left: -8px; }
+.landing-shell[lang="fa"] .scope-hero-file { top: -12px; right: -8px; }
 
-@media (min-width: 901px) {
-  .landing-shell[lang="fa"] .scope-hero h1 > :nth-child(2) { padding-left: 0; padding-inline-start: 27%; }
-  .landing-shell[lang="fa"] .scope-hero-stack { left: auto; right: 2%; }
-  .landing-shell[lang="fa"] .scope-hero-outcome { right: auto; left: 1%; }
+@media (max-width: 900px) {
+  .landing-shell[lang="fa"] .scope-hero-stage {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-areas: "headline headline" "request outcome";
+    max-width: 620px;
+  }
+}
+@media (max-width: 480px) {
+  .landing-shell[lang="fa"] .scope-hero-stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "headline" "request" "outcome";
+  }
+  .landing-shell[lang="fa"] .scope-hero-outcome { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .landing-shell[lang="fa"] :is(.section-heading h2, .showcase-copy h2, .final-cta h2, .demo-dialog h2, .feature-grid h3) {

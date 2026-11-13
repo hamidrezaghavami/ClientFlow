@@ -1,6 +1,6 @@
 'use client';
 
-import { landingDate, translate, type Language } from '../../components/landing-language';
+import { errorMessage, landingDate, translate, type Language } from '../../components/landing-language';
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
 import { Archive, ArrowLeftRight, ArrowUpRight, CalendarDays, ChevronRight, Handshake, LayoutGrid, ListTodo, RotateCcw, Search, Sparkles, UserPlus, X } from 'lucide-react';
 import { ClientAssistant } from './client-assistant';
@@ -132,7 +132,7 @@ export function WorkspaceOverview({ storageKey, language }: { storageKey: string
       setSaveError('');
       return true;
     } catch (error) {
-      setSaveError(error instanceof Error ? error.message : 'Could not save your change.');
+      setSaveError(errorMessage(language, error, 'Could not save your change.'));
       return false;
     } finally {
       saving.current = false;

@@ -1,6 +1,6 @@
 'use client';
 
-import { translate, type Language } from '../../components/landing-language';
+import { errorMessage, translate, type Language } from '../../components/landing-language';
 
 import { useAuth } from '@clerk/nextjs';
 import { postApi } from '../lib/api';
@@ -58,7 +58,7 @@ export function ScopeChangePanel({ language = 'en', project, deadline, scope, on
         setError(t("Copy the link from the field above."));
       }
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'Could not publish the review.');
+      setError(errorMessage(language, problem, 'Could not publish the review.'));
     } finally {
       setBusy(false);
     }
@@ -73,7 +73,7 @@ export function ScopeChangePanel({ language = 'en', project, deadline, scope, on
       await onRefresh();
       setCopied(false);
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'Could not revoke the review.');
+      setError(errorMessage(language, problem, 'Could not revoke the review.'));
     } finally {
       setBusy(false);
     }

@@ -1,3 +1,5 @@
+import { headers } from 'next/headers';
+import { readLanguage } from '../../components/landing-language';
 import type { Metadata } from 'next';
 import { ReviewClient } from './review-client';
 import '../dashboard/workspace.css';
@@ -8,6 +10,6 @@ export const metadata: Metadata = {
   referrer: 'no-referrer',
 };
 
-export default function ReviewPage() {
-  return <ReviewClient />;
+export default async function ReviewPage() {
+  return <ReviewClient language={readLanguage((await headers()).get('x-clientflow-language'))} />;
 }

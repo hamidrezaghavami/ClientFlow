@@ -3,6 +3,48 @@ export type Translate = (text: string) => string;
 
 const translations: Record<'tr' | 'fa', Record<string, string>> = {
   "tr": {
+    "Invalid review request.": "Geçersiz inceleme isteği.",
+    "Sign in to manage your review links.": "İnceleme bağlantılarını yönetmek için giriş yap.",
+    "Review links are temporarily unavailable.": "İnceleme bağlantıları geçici olarak kullanılamıyor.",
+    "The add-on deadline precedes the original deadline.": "Ek işin teslim tarihi, ilk teslim tarihinden önce olamaz.",
+    "Could not publish this link.": "Bağlantı yayımlanamadı.",
+    "This review was already approved or could not be found.": "Bu inceleme daha önce onaylandı veya bulunamadı.",
+    "This review link could not be found.": "İnceleme bağlantısı bulunamadı.",
+    "Review links are temporarily unavailable. Try again shortly.": "İnceleme bağlantıları geçici olarak kullanılamıyor. Birazdan tekrar dene.",
+    "The board data could not be saved. Check the entry and try again.": "Pano kaydedilemedi. Bilgileri kontrol edip tekrar dene.",
+    "Board storage is unavailable.": "Pano şu anda kullanılamıyor.",
+    "The board changed. Review the latest version and try again.": "Pano değişti. Güncel sürümü kontrol edip tekrar dene.",
+    "This board has reached 500 engagements.": "Bu pano 500 iş sınırına ulaştı.",
+    "Board storage is temporarily unavailable. Try again shortly.": "Pano geçici olarak kullanılamıyor. Birazdan tekrar dene.",
+    "This origin is not allowed.": "Bu sayfadan işlem yapılamıyor.",
+    "Your session could not be verified. Sign in again.": "Oturum doğrulanamadı. Tekrar giriş yap.",
+    "Please wait a minute before asking again.": "Tekrar sormadan önce bir dakika bekle.",
+    "Enter a question of up to 1,200 characters.": "En fazla 1.200 karakterlik bir soru gir.",
+    "Gemini is not configured yet.": "Gemini henüz hazır değil.",
+    "Gemini is busy or at its quota. Try again later.": "Gemini meşgul veya kullanım sınırına ulaştı. Daha sonra tekrar dene.",
+    "Gemini rejected the API credentials. Check the key in Vercel.": "Gemini şu anda kullanılamıyor.",
+    "The configured Gemini model is unavailable for this project.": "Gemini modeli bu proje için kullanılamıyor.",
+    "Gemini rejected the request. Please try again.": "Gemini isteği kabul etmedi. Tekrar dene.",
+    "Gemini returned no answer. Try rephrasing your question.": "Gemini yanıt vermedi. Sorunu farklı şekilde yaz.",
+    "Gemini took too long to respond. Please try again.": "Gemini zamanında yanıt vermedi. Tekrar dene.",
+    "Gemini did not respond. Please try again.": "Gemini yanıt vermedi. Tekrar dene.",
+    "Request is too large.": "İstek çok büyük.",
+    "Invalid JSON request.": "Geçersiz istek.",
+    "The API could not process this request.": "İstek işlenemedi.",
+    "The ClientFlow API is unavailable.": "ClientFlow şu anda kullanılamıyor.",
+    "Sign in again to access your board.": "Panona erişmek için tekrar giriş yap.",
+    "Could not load your board.": "Pano yüklenemedi.",
+    "Could not save your change.": "Değişiklik kaydedilemedi.",
+    "Sign in again to use the assistant.": "Asistanı kullanmak için tekrar giriş yap.",
+    "The assistant is unavailable.": "Asistan kullanılamıyor.",
+    "Gemini did not respond. Try again.": "Gemini yanıt vermedi. Tekrar dene.",
+    "Sign in again to manage review links.": "Bağlantıları yönetmek için tekrar giriş yap.",
+    "Could not reach the review service.": "İnceleme hizmetine ulaşılamadı.",
+    "Could not publish the review.": "İnceleme yayımlanamadı.",
+    "Could not revoke the review.": "İnceleme iptal edilemedi.",
+    "This review link is incomplete.": "İnceleme bağlantısı eksik.",
+    "Could not load this review.": "İnceleme yüklenemedi.",
+    "Could not save your decision.": "Kararın kaydedilemedi.",
     "Client Board": "Müşteri panosu",
     "Client stages": "Müşteri aşamaları",
     "Due next": "Yaklaşan teslimler",
@@ -190,6 +232,48 @@ const translations: Record<'tr' | 'fa', Record<string, string>> = {
     "{client} moved to {stage}.": "{client}, {stage} aşamasına taşındı."
   },
   "fa": {
+    "Invalid review request.": "درخواست بررسی نامعتبر است.",
+    "Sign in to manage your review links.": "برای مدیریت لینک‌های بررسی وارد حساب شوید.",
+    "Review links are temporarily unavailable.": "لینک‌های بررسی موقتاً در دسترس نیستند.",
+    "The add-on deadline precedes the original deadline.": "موعد تحویل کار اضافه نمی‌تواند پیش از موعد اولیه باشد.",
+    "Could not publish this link.": "لینک منتشر نشد.",
+    "This review was already approved or could not be found.": "این بررسی قبلاً تأیید شده یا پیدا نشد.",
+    "This review link could not be found.": "لینک بررسی پیدا نشد.",
+    "Review links are temporarily unavailable. Try again shortly.": "لینک‌های بررسی موقتاً در دسترس نیستند. کمی بعد دوباره تلاش کنید.",
+    "The board data could not be saved. Check the entry and try again.": "تابلو ذخیره نشد. اطلاعات را بررسی کنید و دوباره تلاش کنید.",
+    "Board storage is unavailable.": "تابلو فعلاً در دسترس نیست.",
+    "The board changed. Review the latest version and try again.": "تابلو تغییر کرده است. نسخهٔ جدید را بررسی کنید و دوباره تلاش کنید.",
+    "This board has reached 500 engagements.": "این تابلو به سقف ۵۰۰ پروژه رسیده است.",
+    "Board storage is temporarily unavailable. Try again shortly.": "تابلو موقتاً در دسترس نیست. کمی بعد دوباره تلاش کنید.",
+    "This origin is not allowed.": "انجام این کار از این صفحه مجاز نیست.",
+    "Your session could not be verified. Sign in again.": "نشست شما تأیید نشد. دوباره وارد حساب شوید.",
+    "Please wait a minute before asking again.": "پیش از ارسال پیام بعدی یک دقیقه صبر کنید.",
+    "Enter a question of up to 1,200 characters.": "پرسشی با حداکثر ۱۲۰۰ نویسه وارد کنید.",
+    "Gemini is not configured yet.": "جمینای هنوز آماده نیست.",
+    "Gemini is busy or at its quota. Try again later.": "جمینای مشغول است یا به سقف استفاده رسیده. بعداً دوباره تلاش کنید.",
+    "Gemini rejected the API credentials. Check the key in Vercel.": "جمینای در حال حاضر در دسترس نیست.",
+    "The configured Gemini model is unavailable for this project.": "مدل جمینای برای این پروژه در دسترس نیست.",
+    "Gemini rejected the request. Please try again.": "جمینای درخواست را نپذیرفت. دوباره تلاش کنید.",
+    "Gemini returned no answer. Try rephrasing your question.": "جمینای پاسخی نداد. پرسش را به شکل دیگری بنویسید.",
+    "Gemini took too long to respond. Please try again.": "پاسخ جمینای بیش از حد طول کشید. دوباره تلاش کنید.",
+    "Gemini did not respond. Please try again.": "جمینای پاسخ نداد. دوباره تلاش کنید.",
+    "Request is too large.": "درخواست بیش از حد بزرگ است.",
+    "Invalid JSON request.": "درخواست نامعتبر است.",
+    "The API could not process this request.": "درخواست پردازش نشد.",
+    "The ClientFlow API is unavailable.": "کلاینت‌فلو در حال حاضر در دسترس نیست.",
+    "Sign in again to access your board.": "برای دسترسی به تابلو دوباره وارد شوید.",
+    "Could not load your board.": "تابلو بارگیری نشد.",
+    "Could not save your change.": "تغییر ذخیره نشد.",
+    "Sign in again to use the assistant.": "برای استفاده از دستیار دوباره وارد شوید.",
+    "The assistant is unavailable.": "دستیار در دسترس نیست.",
+    "Gemini did not respond. Try again.": "جمینای پاسخ نداد. دوباره تلاش کنید.",
+    "Sign in again to manage review links.": "برای مدیریت لینک‌های بررسی دوباره وارد شوید.",
+    "Could not reach the review service.": "دسترسی به سرویس بررسی ممکن نشد.",
+    "Could not publish the review.": "بررسی منتشر نشد.",
+    "Could not revoke the review.": "بررسی لغو نشد.",
+    "This review link is incomplete.": "لینک بررسی ناقص است.",
+    "Could not load this review.": "بررسی بارگیری نشد.",
+    "Could not save your decision.": "تصمیم شما ذخیره نشد.",
     "Client Board": "تابلوی مشتریان",
     "Client stages": "مرحله‌های پروژه",
     "Due next": "موعدهای نزدیک",
@@ -379,7 +463,7 @@ const translations: Record<'tr' | 'fa', Record<string, string>> = {
 };
 
 export function translate(language: Language): Translate {
-  return text => language === 'en' ? text : translations[language][text] ?? text;
+  return text => language === 'en' ? text : (Object.hasOwn(translations[language], text) ? translations[language][text] : text);
 }
 
 export function landingDate(value: string, language: Language) {
@@ -398,4 +482,10 @@ export function languageHref(path: string, language: Language, query: Record<str
   }
   params.set('lang', language);
   return `${path}?${params}`;
+}
+
+export function errorMessage(language: Language, problem: unknown, fallback: string) {
+  const message = problem instanceof Error ? problem.message : '';
+  const key = Object.hasOwn(translations.tr, message) ? message : fallback;
+  return translate(language)(key);
 }

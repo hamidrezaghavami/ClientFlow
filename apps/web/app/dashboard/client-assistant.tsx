@@ -1,6 +1,6 @@
 'use client';
 
-import { translate, type Language } from '../../components/landing-language';
+import { errorMessage, translate, type Language } from '../../components/landing-language';
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useAuth } from '@clerk/nextjs';
@@ -79,7 +79,7 @@ export function ClientAssistant({ language = 'en', projects, draft }: { language
       if (!controller.signal.aborted) setAnswer(data.answer);
     } catch (problem) {
       if (!controller.signal.aborted) {
-        setError(problem instanceof Error && problem.name === 'Error' ? problem.message : 'Gemini did not respond. Try again.');
+        setError(errorMessage(language, problem, 'Gemini did not respond. Try again.'));
         setQuestion(message);
       }
     } finally {

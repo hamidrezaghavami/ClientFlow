@@ -1,12 +1,13 @@
 'use client';
 
+import { errorMessage, translate, type Language } from '../../components/landing-language';
 import { postApi } from '../lib/api';
 import { useEffect, useState } from 'react';
 import { ReviewOptions, type ReviewChoice, type ReviewTerms } from './review-options';
 
 type Review = { project: string; proposal: ReviewTerms; choice: ReviewChoice | null };
 
-export function ReviewClient() {
+export function ReviewClient({ language }: { language: Language }) {
   const [token, setToken] = useState('');
   const [review, setReview] = useState<Review>();
   const [selected, setSelected] = useState<ReviewChoice | null>(null);
@@ -16,7 +17,7 @@ export function ReviewClient() {
   useEffect(() => {
     const secret = window.location.hash.slice(1);
     if (!/^[a-f0-9-]{72}$/.test(secret)) {
-      setError('This review link is incomplete.');
+      setError(translate(language)('This review link is incomplete.'));
       return;
     }
     setToken(secret);
@@ -26,10 +27,10 @@ export function ReviewClient() {
       if (!response.ok) throw new Error(result.error);
       setReview(result.review);
     }).catch(problem => {
-      if (!controller.signal.aborted) setError(problem.message || 'Could not load this review.');
+      if (!controller.signal.aborted) setError(errorMessage(language, problem, 'Could not load this review.'));
     });
     return () => controller.abort();
-  }, []);
+  }, [language]);
 
   async function approve() {
     if (!review || !selected || pending) return;
@@ -41,7 +42,7 @@ export function ReviewClient() {
       if (!response.ok) throw new Error(result.error);
       setReview({ ...review, choice: result.review.choice });
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'Could not save your decision.');
+      setError(errorMessage(language, problem, 'Could not save your decision.'));
     } finally {
       setPending(false);
     }

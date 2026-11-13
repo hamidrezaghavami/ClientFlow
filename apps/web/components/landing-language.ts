@@ -3,6 +3,7 @@ export type Translate = (text: string) => string;
 
 const translations: Record<'tr' | 'fa', Record<string, string>> = {
   "tr": {
+    "Skip to dashboard": "Panoya geç",
     "ClientFlow home": "ClientFlow ana sayfası",
     "Skip to content": "İçeriğe geç",
     "Main navigation": "Ana menü",
@@ -87,6 +88,7 @@ const translations: Record<'tr' | 'fa', Record<string, string>> = {
     "{client} moved to {stage}.": "{client}, {stage} aşamasına taşındı."
   },
   "fa": {
+    "Skip to dashboard": "رفتن به داشبورد",
     "ClientFlow home": "صفحهٔ اصلی کلاینت‌فلو",
     "Skip to content": "رفتن به محتوا",
     "Main navigation": "منوی اصلی",
@@ -178,4 +180,18 @@ export function translate(language: Language): Translate {
 
 export function landingDate(value: string, language: Language) {
   return new Intl.DateTimeFormat(language === 'fa' ? 'fa-IR-u-ca-persian' : language, { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(`${value}T00:00:00Z`));
+}
+
+export function readLanguage(value: unknown): Language {
+  return value === 'tr' || value === 'fa' ? value : 'en';
+}
+
+export function languageHref(path: string, language: Language, query: Record<string, string | string[]> = {}) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (key === 'lang') continue;
+    for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
+  }
+  params.set('lang', language);
+  return `${path}?${params}`;
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { translate, type Language } from '../../components/landing-language';
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
 import { Archive, ArrowLeftRight, ArrowUpRight, CalendarDays, ChevronRight, Handshake, LayoutGrid, ListTodo, RotateCcw, Search, Sparkles, UserPlus, X } from 'lucide-react';
 import { ClientAssistant } from './client-assistant';
@@ -13,7 +14,8 @@ import { formatDeadline, initialClients } from '../lib/sample-engagements';
 
 type Stage = Engagement["stage"];
 
-export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
+export function WorkspaceOverview({ storageKey, language }: { storageKey: string; language: Language }) {
+  const t = translate(language);
   const { getToken } = useAuth();
   const [clients, setClients] = useState(initialClients);
   const [ready, setReady] = useState(false);
@@ -217,7 +219,7 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
         <div className="client-board-toolbar">
           <label className="client-board-search">
             <Search size={16} aria-hidden="true" />
-            <input type="search" aria-label="Search client engagements" placeholder="Search clients or projects"
+            <input type="search" aria-label="Search client engagements" placeholder={t("Search clients or projects")}
               value={query} onChange={event => setQuery(event.target.value)} />
           </label>
         </div>
@@ -226,7 +228,7 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
             const items = visibleClients.filter(item => item.stage === stage);
             return (
               <section className="client-board-column" data-stage={index} data-stacked={items.length > 1} data-empty={items.length === 0} key={stage} aria-labelledby={`client-stage-${index}`}>
-                <h2 id={`client-stage-${index}`}><i data-stage={index} aria-hidden="true" />{stage}<span>{items.length}</span></h2>
+                <h2 id={`client-stage-${index}`}><i data-stage={index} aria-hidden="true" />{t(stage)}<span>{items.length}</span></h2>
                 {items.length === 0 && <p className="client-board-empty">{search ? 'No matches.' : 'No clients here yet.'}</p>}
                 {items.map(item => (
                   <article className="client-board-card" key={item.id}>
@@ -246,14 +248,14 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
                           {item.deadline && <span><CalendarDays size={14} aria-hidden="true" /> Due {formatDeadline(item.deadline)}</span>}
                         </div>
                         {item.nextAction && <p className="client-card-next"><ListTodo size={14} aria-hidden="true" />
-                          <span><strong>Next action</strong>{item.nextAction}</span></p>}
+                          <span><strong>{t("Next action")}</strong>{item.nextAction}</span></p>}
                         <button type="button" className="client-scope-trigger" onClick={() => setScopeId(item.id)}
                           aria-label={`Scope changes for ${item.client}`} aria-haspopup="dialog">
                           <ArrowLeftRight size={14} aria-hidden="true" />
                           {item.scope?.pending ? 'Scope decision pending' : 'Scope changes'}
                         </button>
                         <label className="client-board-stage">
-                          <span>Stage</span>
+                          <span>{t("Stage")}</span>
                           <select id={`client-stage-control-${item.id}`} value={item.stage} disabled={isSaving} aria-label={`Stage for ${item.client}`} onChange={async event => {
                             const next = stages.find(value => value === event.target.value);
                             if (next) {
@@ -261,7 +263,7 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
                               requestAnimationFrame(() => document.getElementById(`client-stage-control-${item.id}`)?.focus());
                             }
                           }}>
-                            {stages.map(value => <option key={value}>{value}</option>)}
+                            {stages.map(value => <option key={value} value={value}>{t(value)}</option>)}
                           </select>
                         </label>
                       </div>
@@ -377,7 +379,7 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
             <label>Project<input name="project" required maxLength={100} defaultValue={draft.project}
               onInput={event => event.currentTarget.setCustomValidity('')} /></label>
             <label>Contact name<input name="contact" maxLength={80} defaultValue={draft.contact} /></label>
-            <label>Next action<input name="nextAction" maxLength={140} placeholder="e.g. Send the first draft"
+            <label>{t("Next action")}<input name="nextAction" maxLength={140} placeholder="e.g. Send the first draft"
               defaultValue={draft.nextAction} /></label>
             <label>Who’s up next?
               <select name="actionOwner" value={draft.actionOwner ?? 'me'} onChange={event => {
@@ -392,7 +394,7 @@ export function WorkspaceOverview({ storageKey }: { storageKey: string }) {
             {draft.scope?.pending?.token
               ? <p className="client-board-note">The deadline is locked while the client review is open.</p>
               : <DeadlinePicker initialValue={draft.deadline} />}
-            <label>Stage<select name="stage" defaultValue={draft.stage}>{stages.map(stage => <option key={stage}>{stage}</option>)}</select></label>
+            <label>{t("Stage")}<select name="stage" defaultValue={draft.stage}>{stages.map(stage => <option key={stage} value={stage}>{t(stage)}</option>)}</select></label>
             {saveError && <p role="alert">{saveError}</p>}
             <div className="client-editor-actions">
               {draft.id && <button type="button" className="client-archive-action" disabled={isSaving} onClick={async () => {

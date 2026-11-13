@@ -2,7 +2,7 @@ import type { Translate } from './landing-language';
 import Link from 'next/link';
 import { ArrowDown, ArrowLeftRight, ArrowUpRight, CalendarDays, Check, FileCheck2, Link2, MessageSquare, MousePointer2, Plus, Send } from 'lucide-react';
 
-export function ScopeHero({ onTour, t }: { onTour: () => void; t: Translate }) {
+export function ScopeHero({ onTour, t, signUpHref }: { onTour: () => void; t: Translate; signUpHref: string }) {
   return (
     <section className="scope-hero" aria-labelledby="landing-title">
       <div className="scope-hero-stage">
@@ -42,7 +42,7 @@ export function ScopeHero({ onTour, t }: { onTour: () => void; t: Translate }) {
 
       <p>{t("Keep projects moving. Give clients clear options when the scope changes, and keep every decision with the project.")} </p>
       <div className="scope-hero-actions">
-        <Link className="scope-hero-cta" href="/sign-up">{t("Get started")} <ArrowUpRight aria-hidden="true" size={21} /></Link>
+        <Link className="scope-hero-cta" href={signUpHref}>{t("Get started")} <ArrowUpRight aria-hidden="true" size={21} /></Link>
         <button className="scope-hero-tour" onClick={onTour}>{t("Take a tour")} <ArrowUpRight aria-hidden="true" size={14} /></button>
       </div>
       <a className="scope-hero-down" href="#features" aria-label={t("See how ClientFlow works")}><ArrowDown size={18} aria-hidden="true" /></a>

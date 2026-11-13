@@ -201,21 +201,18 @@
   line-height: .9;
   letter-spacing: -.02em;
 }
-.landing-shell[dir="rtl"] { --clientflow-display: "Geeza Pro", Tahoma, Arial, sans-serif; font-family: var(--clientflow-display); }
-.landing-shell[dir="rtl"] .scope-hero h1 { font-size: clamp(37px, 5.7vw, 82px); line-height: 1.2; letter-spacing: normal; }
-.landing-shell[dir="rtl"] .scope-hero-stack { text-align: start; }
-.landing-shell[dir="rtl"] .showcase-copy ol { padding-inline-start: 0; }
-.landing-shell[dir="rtl"] .site-footer p { margin-left: 0; margin-inline-start: auto; }
-.landing-shell[dir="rtl"] .preview-client-stage h4 > span { margin-left: 0; margin-inline-start: auto; }
-.landing-shell[dir="rtl"] .text-link svg { scale: -1 1; }
-@media (max-width: 900px) {
-  .landing-shell[lang="fa"] .scope-hero-stack { height: 150px; }
+.landing-shell[lang="fa"] {
+  --clientflow-display: "Geeza Pro", Tahoma, Arial, sans-serif;
+  font-family: var(--clientflow-display);
 }
-
-@media (min-width: 901px) {
-  .landing-shell[lang="fa"] .scope-hero h1 > :nth-child(2) { padding-left: 0; padding-inline-start: 27%; }
-  .landing-shell[lang="fa"] .scope-hero-stack { left: auto; right: 1%; width: 31%; }
-  .landing-shell[lang="fa"] .scope-hero-outcome { right: auto; left: 1%; width: 23%; }
+.landing-shell[lang="fa"] .scope-hero h1 {
+  font-size: clamp(37px, 5.7vw, 82px);
+  line-height: 1.2;
+  letter-spacing: normal;
+}
+.landing-shell[lang="fa"] :is(h1, h2, h3, p, .scope-hero-tile > strong, .scope-hero-tile > small) {
+  unicode-bidi: plaintext;
+  text-align: match-parent;
 }
 
 .landing-shell[lang="fa"] :is(.section-heading h2, .showcase-copy h2, .final-cta h2, .demo-dialog h2, .feature-grid h3) {
@@ -228,5 +225,4 @@
 .landing-shell[lang="fa"] :is(.eyebrow, .scope-hero-tile > strong) { letter-spacing: normal; }
 .landing-shell[lang="fa"] .scope-hero-tile > strong { max-width: none; line-height: 1.3; }
 .landing-shell[lang="fa"] :is(.scope-hero-tile, .dashboard-preview-card) { text-align: start; }
-.landing-shell[lang="fa"] :is(.demo-dialog select, .close-dialog) { direction: rtl; }
-.landing-shell[lang="fa"] .close-dialog { right: auto; left: 14px; }
+.landing-shell[lang="fa"] .demo-dialog select { direction: rtl; }

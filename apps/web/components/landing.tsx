@@ -59,7 +59,7 @@ export default function Landing({ language }: { language: Language }) {
   }, []);
 
   const open = (p: Panel) => { setMenu(false); setPanel(p); };
-  return <div className="landing-shell" lang={language} dir={language === 'fa' ? 'rtl' : 'ltr'}>
+  return <div className="landing-shell" lang={language} dir="ltr">
     <a className="skip-link" href="#main">{t("Skip to content")} </a>
     <header id="top" tabIndex={-1} className="site-header"><div className="header-inner"><Brand t={t}/><nav className="desktop-nav" aria-label={t("Main navigation")}><a href="#features">{t("Why ClientFlow")} </a><a href="#how-it-works">{t("How it works")} </a><button onClick={() => open('demo')}>{t("Take a tour")} <ArrowUpRight size={14}/></button></nav><div className="header-actions"><LanguageLinks language={language} /><Link className="signin" href="/sign-in">{t("Sign in")} </Link><Link className="button dark small" href="/sign-up">{t("Get started")} <ArrowUpRight size={16}/></Link></div><button className="menu-toggle" aria-label={t(menu ? 'Close navigation' : 'Open navigation')} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button></div>{menu && <nav className="mobile-nav" aria-label={t("Mobile navigation")}><LanguageLinks language={language} /><a href="#features" onClick={() => setMenu(false)}>{t("Why ClientFlow")} </a><a href="#how-it-works" onClick={() => setMenu(false)}>{t("How it works")} </a><button onClick={() => open('demo')}>{t("Explore demo")} </button><Link href="/sign-in">{t("Sign in")} </Link><Link href="/sign-up">{t("Get started")} </Link></nav>}</header>
     <main id="main">
